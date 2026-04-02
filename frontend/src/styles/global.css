@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --font:      'Inter', sans-serif;
+  --mono:      'Courier New', monospace;
+  --bg:        #f4f5f7;
+  --surface:   #ffffff;
+  --surface2:  #f8fafc;
+  --border:    #e2e8f0;
+  --border2:   #94a3b8;
+  --text:      #1e293b;
+  --text2:     #64748b;
+  --text3:     #94a3b8;
+  --accent:    #005EB8;
+  --accent-h:  #004494;
+  --accent-l:  #eff6ff;
+  --green:     #16a34a;
+  --green-l:   #dcfce7;
+  --red:       #dc2626;
+  --red-l:     #fee2e2;
+  --amber:     #d97706;
+  --amber-l:   #fef3c7;
+  --purple:    #7c3aed;
+  --purple-l:  #f5f3ff;
+  --radius:    4px;
+  --radius-lg: 8px;
+  --shadow:    0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,.07), 0 2px 4px -1px rgba(0,0,0,.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+button { font-family: var(--font); font-size: 13px; cursor: pointer; }
+input, select, textarea { font-family: var(--font); font-size: 12px; outline: none; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; opacity: .5; }
