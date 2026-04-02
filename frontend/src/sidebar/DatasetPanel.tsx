@@ -5,7 +5,8 @@ import { useDashboardStore } from "../store/dashboardStore"
 export default function DatasetPanel() {
 
   const setDataset = useDashboardStore((s) => s.setDataset)
-  const [filename, setFilename] = useState<string | null>(null)
+  const datasetName = useDashboardStore((s) => s.datasetName)
+  const dataset = useDashboardStore((s) => s.dashboard.dataset)
   const [dragging, setDragging] = useState(false)
   const [loading, setLoading] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -13,9 +14,8 @@ export default function DatasetPanel() {
   async function processFile(file: File) {
     setLoading(true)
     try {
-      setFilename(file.name)
-      const dataset = await loadDataset(file)
-      setDataset(dataset)
+      const result = await loadDataset(file)
+      setDataset(result, file.name)
     } finally {
       setLoading(false)
     }
@@ -43,7 +43,7 @@ export default function DatasetPanel() {
       <div className="section-label">Dataset</div>
 
       <div
-        className={`upload-zone${dragging ? " drag-over" : ""}${filename ? " has-file" : ""}`}
+        className={`upload-zone${dragging ? " drag-over" : ""}${datasetName ? " has-file" : ""}`}
         onClick={() => inputRef.current?.click()}
         onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
         onDragLeave={() => setDragging(false)}
@@ -64,7 +64,7 @@ export default function DatasetPanel() {
                 <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.8s" repeatCount="indefinite"/>
               </circle>
             </svg>
-          ) : filename ? (
+          ) : datasetName ? (
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
               <path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
@@ -76,10 +76,13 @@ export default function DatasetPanel() {
           )}
         </div>
 
-        {filename ? (
+        {datasetName ? (
           <>
-            <div className="upload-filename">{filename}</div>
-            <div className="upload-sub">Click to replace</div>
+            <div className="upload-filename">{datasetName}</div>
+            <div className="upload-sub">
+              {dataset ? `${dataset.columns.length} columns · ${dataset.rows.length} rows` : ""}
+              {" · "}Click to replace
+            </div>
           </>
         ) : (
           <>

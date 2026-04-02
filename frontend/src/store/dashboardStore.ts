@@ -13,7 +13,8 @@ interface DashboardStore extends DashboardState {
   updateWidgets: (widgets: Widget[]) => void
   deleteWidget: (id: string) => void
   selectWidget: (id: string | null) => void
-  setDataset: (dataset: Dataset) => void
+  datasetName: string | null
+  setDataset: (dataset: Dataset, name: string) => void
   setZoom: (zoom: number) => void
   setShowGrid: (show: boolean) => void
   showGrid: boolean
@@ -71,6 +72,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
   past: [],
   future: [],
   guideLines: { vertical: [], horizontal: [] },
+  datasetName: null,
 
   // ── widget mutations ──
 
@@ -147,8 +149,9 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
 
   // ── dataset / settings ──
 
-  setDataset: (dataset) => set((state) => ({
-    dashboard: { ...state.dashboard, dataset }
+  setDataset: (dataset, name) => set((state) => ({
+    dashboard: { ...state.dashboard, dataset },
+    datasetName: name
   })),
 
   setZoom: (zoom) => set(() => ({ zoom })),

@@ -65,7 +65,7 @@ export default function Canvas(){
    addWidget({ ...base, columns:[] } as any)
    return
   }
-  addWidget({ ...base, title:"Chart", color:"#2b7cff", query:{ xColumn:"", yColumn:"", aggregation:"SUM" } } as any)
+  addWidget({ ...base, title:"Chart", query:{ xColumn:"", yColumn:"", aggregation:"SUM" } } as any)
  }
 
  const ZOOM_STEP = 10
