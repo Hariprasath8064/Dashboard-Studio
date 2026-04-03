@@ -7,13 +7,17 @@ import ResizeHandles from "./ResizeHandles"
 import BarChartWidget  from "../widgets/BarChart/BarChartWidget"
 import LineChartWidget from "../widgets/LineChart/LineChartWidget"
 import DonutWidget     from "../widgets/DonutChart/DonutWidget"
+import PieChartWidget  from "../widgets/PieChart/PieChartWidget"
+import GaugeWidget     from "../widgets/GaugeWidget/GaugeWidget"
+import TimelineWidget  from "../widgets/Timeline/TimelineWidget"
 import KPIWidget       from "../widgets/KPIWidget/KPIWidget"
 import TableWidget     from "../widgets/TableWidget/TableWidget"
 import TextWidget      from "../widgets/TextWidget/TextWidget"
 import { snap, snapToEdges } from "../utils/snapGrid"
 
 const TYPE_ICON: Record<string, string> = {
-  bar: "▤", line: "↗", donut: "◎", kpi: "#", table: "⊞", text: "T"
+  bar: "▤", line: "↗", donut: "◎", pie: "◔", gauge: "◑", timeline: "≡",
+  kpi: "#", table: "⊞", text: "T"
 }
 
 interface Props {
@@ -124,29 +128,46 @@ export default function CanvasWidget({ widget }: Props) {
   }
 
   function onDrop(e: React.DragEvent) {
-    const column = e.dataTransfer.getData("dataset-column")
+    e.stopPropagation()  // prevent canvas from also creating a new widget
+    e.preventDefault()
+    const column  = e.dataTransfer.getData("dataset-column")
+    const colType = e.dataTransfer.getData("dataset-column-type")
     if (!column) return
-    if (widget.type === "bar" || widget.type === "line" || widget.type === "donut") {
+
+    if (widget.type === "bar" || widget.type === "line" || widget.type === "donut" ||
+        widget.type === "pie" || widget.type === "gauge" || widget.type === "timeline") {
       const chart = widget as any
-      if (!chart.query.xColumn) {
-        updateWidget({ ...chart, query: { ...chart.query, xColumn: column } })
-        return
-      }
-      if (!chart.query.yColumn) {
+      // numerics → Y axis, dimensions/dates → X axis
+      if (colType === "number") {
         updateWidget({ ...chart, query: { ...chart.query, yColumn: column } })
+      } else {
+        updateWidget({ ...chart, query: { ...chart.query, xColumn: column } })
+      }
+    } else if (widget.type === "table") {
+      const tbl = widget as any
+      if (!tbl.columns.includes(column)) {
+        updateWidget({ ...tbl, columns: [...tbl.columns, column] })
+      }
+    } else if (widget.type === "kpi") {
+      if (colType === "number") {
+        const kpi = widget as any
+        updateWidget({ ...kpi, valueColumn: column, label: kpi.label || column })
       }
     }
   }
 
   function renderWidget(w: Widget) {
     switch (w.type) {
-      case "bar":   return <BarChartWidget  widget={w as any} />
-      case "line":  return <LineChartWidget widget={w as any} />
-      case "donut": return <DonutWidget     widget={w as any} />
-      case "kpi":   return <KPIWidget       widget={w as any} />
-      case "table": return <TableWidget     widget={w as any} />
-      case "text":  return <TextWidget      widget={w as any} />
-      default:      return null
+      case "bar":       return <BarChartWidget  widget={w as any} />
+      case "line":      return <LineChartWidget widget={w as any} />
+      case "donut":     return <DonutWidget     widget={w as any} />
+      case "pie":       return <PieChartWidget  widget={w as any} />
+      case "gauge":     return <GaugeWidget     widget={w as any} />
+      case "timeline":  return <TimelineWidget  widget={w as any} />
+      case "kpi":       return <KPIWidget       widget={w as any} />
+      case "table":     return <TableWidget     widget={w as any} />
+      case "text":      return <TextWidget      widget={w as any} />
+      default:          return null
     }
   }
 

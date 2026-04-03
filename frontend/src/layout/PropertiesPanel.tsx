@@ -20,6 +20,10 @@ const TYPE_LABELS: Record<string, string> = {
  bar: "Bar Chart",
  line: "Line Chart",
  donut: "Donut Chart",
+ pie: "Pie Chart",
+ gauge: "Gauge",
+ histogram: "Histogram",
+ timeline: "Timeline",
  kpi: "KPI Card",
  table: "Table",
  text: "Text"
@@ -35,7 +39,6 @@ function CanvasProperties() {
  const setCanvasBg  = useDashboardStore(s => s.setCanvasBg)
 
  const bgColor = background?.color || "#f4f6f9"
- const bgImage = background?.image || ""
 
  return (
   <div className="pp-scroll">
@@ -101,25 +104,6 @@ function CanvasProperties() {
      ))}
     </div>
 
-    <div className="pp-row">
-     <span className="pp-label">Image URL</span>
-     <input
-      className="pp-input"
-      type="url"
-      placeholder="https://..."
-      value={bgImage}
-      onChange={e => setCanvasBg({ image: e.target.value })}
-     />
-    </div>
-
-    {bgImage && (
-     <div style={{ paddingTop: 4 }}>
-      <button className="pp-btn-outline" onClick={() => setCanvasBg({ image: "" })}>
-       Clear image
-      </button>
-     </div>
-    )}
-
    </div>
 
   </div>
@@ -148,7 +132,8 @@ export default function PropertiesPanel(){
  const isTableWidget = (w: Widget): w is TableWidget => w.type === "table"
  const isKPIWidget   = (w: Widget): w is KPIWidget   => w.type === "kpi"
  const isChartWidget = (w: Widget): w is ChartWidget =>
-  w.type === "bar" || w.type === "line" || w.type === "donut"
+  w.type === "bar" || w.type === "line" || w.type === "donut" ||
+  w.type === "pie" || w.type === "gauge" || w.type === "timeline"
 
  function renderDataPanel(widget: Widget){
   if(isTextWidget(widget))  return <TextProperties  widget={widget} />

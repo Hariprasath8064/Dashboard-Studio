@@ -3,6 +3,7 @@ import { useState, useEffect } from "react"
 import Topbar         from "../layout/Topbar"
 import Sidebar        from "../layout/Sidebar"
 import Canvas         from "../canvas/Canvas"
+import FieldsPanel    from "../layout/FieldsPanel"
 import PropertiesPanel from "../layout/PropertiesPanel"
 import TrashZone      from "../layout/TrashZone"
 
@@ -74,6 +75,8 @@ export default function DashboardBuilder(){
      <Sidebar/>
 
      <Canvas/>
+
+     <FieldsPanel/>
 
      <PropertiesPanel/>
 

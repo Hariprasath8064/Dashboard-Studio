@@ -229,6 +229,9 @@ function renderWidgetHTML(widget:any,columns:any[],rows:any[]){
   case "bar":
   case "line":
   case "donut":
+  case "pie":
+  case "gauge":
+  case "timeline":
    return `
    <div class="widget" style="${frameStyle}">
     <div class="widget-inner">
@@ -258,17 +261,40 @@ function renderWidgetHTML(widget:any,columns:any[],rows:any[]){
    `
   }
 
-  case "text":
+  case "text": {
+   const hStyle = [
+    `font-size:${widget?.headingSize ?? 18}px`,
+    `font-weight:${widget?.headingBold   ? 700 : 500}`,
+    `font-style:${widget?.headingItalic  ? "italic" : "normal"}`,
+    `text-align:${widget?.headingAlign   || "left"}`,
+    widget?.headingColor ? `color:${widget.headingColor}` : "color:#1b1f24",
+    widget?.headingFont  ? `font-family:${widget.headingFont}` : "",
+    "line-height:1.3",
+    "margin-bottom:6px",
+   ].filter(Boolean).join(";")
+
+   const bStyle = [
+    `font-size:${widget?.bodySize ?? 13}px`,
+    `font-weight:${widget?.bodyBold      ? 700 : 400}`,
+    `font-style:${widget?.bodyItalic     ? "italic" : "normal"}`,
+    `text-decoration:${widget?.bodyUnderline ? "underline" : "none"}`,
+    `text-align:${widget?.bodyAlign      || "left"}`,
+    widget?.bodyColor ? `color:${widget.bodyColor}` : "color:#5a5f66",
+    widget?.bodyFont  ? `font-family:${widget.bodyFont}` : "",
+    "line-height:1.6",
+   ].filter(Boolean).join(";")
+
    return `
    <div class="widget" style="${frameStyle}">
     <div class="widget-inner">
      <div class="text-inner">
-      <div class="text-wg-h1">${escapeHtml(widget?.heading || "Heading")}</div>
-      <div class="text-wg-p">${escapeHtml(widget?.body || "")}</div>
+      <div class="text-wg-h1" style="${hStyle}">${escapeHtml(widget?.heading || "Heading")}</div>
+      <div class="text-wg-p"  style="${bStyle}">${escapeHtml(widget?.body || "")}</div>
      </div>
     </div>
    </div>
    `
+  }
 
   case "table":
    return `

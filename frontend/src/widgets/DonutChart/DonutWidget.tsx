@@ -50,7 +50,8 @@ export default function DonutWidget({ widget }: Props) {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        cutout: "70%"
+        cutout: "70%",
+        plugins: { legend: { display: widget.showLegend !== false } }
       }
 
     })

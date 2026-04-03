@@ -1,5 +1,4 @@
 import { useRef, useState, useEffect } from "react"
-import { useDashboardStore } from "../store/dashboardStore"
 
 const PROXIMITY_RADIUS = 120
 

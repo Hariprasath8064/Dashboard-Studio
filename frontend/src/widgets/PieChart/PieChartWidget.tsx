@@ -3,15 +3,22 @@ import Chart from "chart.js/auto"
 import type { ChartWidget } from "../../types/widgetTypes"
 import { useDashboardStore } from "../../store/dashboardStore"
 import { runAggregation } from "../../dataset/QueryEngine"
+import { chartColors } from "../../constants/chartColors"
 
-interface Props {
-  widget: ChartWidget
+function resolveColors(widget: ChartWidget, count: number): string[] {
+  if (Array.isArray(widget.barColors) && widget.barColors.length > 0) {
+    return Array.from({ length: count }, (_, i) => widget.barColors![i] || chartColors[i % chartColors.length])
+  }
+  if (widget.color) return Array(count).fill(widget.color)
+  return Array.from({ length: count }, (_, i) => chartColors[i % chartColors.length])
 }
 
-export default function LineChartWidget({ widget }: Props) {
+interface Props { widget: ChartWidget }
+
+export default function PieChartWidget({ widget }: Props) {
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const dataset = useDashboardStore((s) => s.dashboard.dataset)
+  const dataset   = useDashboardStore((s) => s.dashboard.dataset)
 
   useEffect(() => {
 
@@ -25,28 +32,16 @@ export default function LineChartWidget({ widget }: Props) {
     )
 
     const chart = new Chart(canvasRef.current, {
-
-      type: "line",
-
+      type: "pie",
       data: {
         labels: result.labels,
-        datasets: [
-          {
-            label: widget.title,
-            data: result.values,
-            borderColor: widget.color || "#005EB8",
-            backgroundColor:widget.color || "#005EB8",
-            tension: 0.3
-          }
-        ]
+        datasets: [{ data: result.values, backgroundColor: resolveColors(widget, result.values.length) }]
       },
-
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: { legend: { display: widget.showLegend !== false } }
       }
-
     })
 
     return () => chart.destroy()
@@ -54,15 +49,9 @@ export default function LineChartWidget({ widget }: Props) {
   }, [dataset, widget])
 
   return (
-
     <div className="chart-inner">
-
       <div className="wg-title">{widget.title}</div>
-
       <canvas ref={canvasRef} />
-
     </div>
-
   )
-
 }

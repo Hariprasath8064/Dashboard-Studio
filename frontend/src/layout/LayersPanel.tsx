@@ -10,6 +10,9 @@ export default function LayersPanel(){
   bar: '#005EB8',
   line: '#0891b2',
   donut: '#7c3aed',
+  pie: '#f59e0b',
+  gauge: '#06b6d4',
+  timeline: '#ec4899',
   kpi: '#16a34a',
   table: '#d97706',
   text: '#94a3b8'
@@ -19,6 +22,9 @@ export default function LayersPanel(){
   bar: 'Bar Chart',
   line: 'Line Chart',
   donut: 'Donut',
+  pie: 'Pie Chart',
+  gauge: 'Gauge',
+  timeline: 'Timeline',
   kpi: 'KPI Card',
   table: 'Table',
   text: 'Text'

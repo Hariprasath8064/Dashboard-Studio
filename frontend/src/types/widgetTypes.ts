@@ -4,6 +4,9 @@ export type WidgetType =
   | "bar"
   | "line"
   | "donut"
+  | "pie"
+  | "gauge"
+  | "timeline"
   | "kpi"
   | "table"
   | "text"
@@ -101,6 +104,22 @@ export interface TextWidget extends WidgetBase {
   heading: string
 
   body: string
+
+  // ── Text styling ──
+  headingSize?:   number
+  headingColor?:  string
+  headingBold?:   boolean
+  headingItalic?: boolean
+  headingAlign?:  "left" | "center" | "right"
+  headingFont?:   string
+
+  bodySize?:      number
+  bodyColor?:     string
+  bodyBold?:      boolean
+  bodyItalic?:    boolean
+  bodyUnderline?: boolean
+  bodyAlign?:     "left" | "center" | "right"
+  bodyFont?:      string
 
 }
 

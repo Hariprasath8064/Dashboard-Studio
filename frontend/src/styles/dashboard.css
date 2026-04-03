@@ -646,6 +646,183 @@
   line-height: 1.6;
 }
 
+/* ── FIELDS PANEL (right collapsible) ── */
+.fields-panel {
+  flex-shrink: 0;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: width .2s ease;
+  position: relative;
+}
+.fields-panel-open   { width: 230px; }
+.fields-panel-closed { width: 32px; }
+
+/* ── Collapse toggle ── */
+.fields-panel-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-shrink: 0;
+  width: 100%;
+  height: 36px;
+  border: none;
+  background: transparent;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  color: var(--text3);
+  transition: color .12s, background .12s;
+}
+.fields-panel-toggle:hover { background: var(--bg); color: var(--text); }
+
+.fp-collapsed-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0 4px;
+  color: var(--text3);
+  opacity: 0.5;
+}
+
+/* ── Panel body ── */
+.fields-panel-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.fields-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  flex-shrink: 0;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+.fields-panel-title { flex: 1; }
+
+.fields-panel-count {
+  font-size: 10px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--accent-l);
+  color: var(--accent);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Dataset stat card ── */
+.fp-dataset-card {
+  margin: 10px 10px 0;
+  padding: 8px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.fp-dataset-name {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 5px;
+}
+.fp-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.fp-stat {
+  font-size: 10.5px;
+  color: var(--text3);
+}
+.fp-stat b { color: var(--text2); font-weight: 600; }
+.fp-stat-dim    b { color: var(--green); }
+.fp-stat-metric b { color: var(--accent); }
+.fp-stat-sep { color: var(--border2); font-size: 10px; }
+
+/* ── Search ── */
+.fp-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 10px 0;
+  padding: 0 8px;
+  height: 28px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color .12s;
+}
+.fp-search-wrap:focus-within { border-color: var(--accent); }
+.fp-search-icon { color: var(--text3); flex-shrink: 0; }
+.fp-search {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 11px;
+  color: var(--text);
+  outline: none;
+  min-width: 0;
+}
+.fp-search-clear {
+  border: none;
+  background: none;
+  color: var(--text3);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+}
+.fp-search-clear:hover { color: var(--text); }
+
+/* ── Drag hint ── */
+.fp-hint {
+  font-size: 10px;
+  color: var(--text3);
+  padding: 5px 12px 2px;
+  font-style: italic;
+}
+
+/* ── Scroll area ── */
+.fields-panel-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 10px 16px;
+}
+
+/* ── Empty state ── */
+.fp-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--text3);
+  font-size: 11px;
+  text-align: center;
+  padding: 24px 16px;
+  line-height: 1.6;
+}
+
 /* ── PROPERTIES PANEL ── */
 #props-panel {
   width: 256px;
@@ -827,6 +1004,32 @@
   box-shadow: var(--shadow);
 }
 
+/* Text format buttons (Bold / Italic / Underline / align) */
+.txt-fmt-group {
+  display: flex;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.txt-fmt-btn {
+  min-width: 26px;
+  height: 26px;
+  border: none;
+  background: transparent;
+  color: var(--text2);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .12s, color .12s;
+  padding: 0 5px;
+}
+.txt-fmt-btn:hover { background: var(--border); color: var(--text); }
+.txt-fmt-btn.on    { background: var(--accent); color: #fff; }
+
 /* Color swatches */
 .pp-color-swatches {
   display: flex;
@@ -985,23 +1188,89 @@
 .col-chip {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   height: 30px;
-  padding: 0 8px;
+  padding: 0 8px 0 7px;
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  margin-bottom: 5px;
+  margin-bottom: 4px;
+  cursor: grab;
+  user-select: none;
+  transition: border-color .12s, background .12s;
+}
+.col-chip:hover { border-color: var(--border2); background: var(--surface); }
+.col-chip:active { cursor: grabbing; }
+
+/* Icon slot inside chip */
+.col-chip-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
-.col-name { font-size: 11px; color: var(--text); flex: 1; }
-.col-type {
-  font-size: 9px;
-  padding: 2px 6px;
-  border-radius: 3px;
-  background: var(--surface);
+/* Icon color per role */
+.col-chip-dim    .col-chip-icon { color: var(--green); }
+.col-chip-date   .col-chip-icon { color: var(--amber); }
+.col-chip-metric .col-chip-icon { color: var(--accent); }
+
+/* Subtle left-border accent per role */
+.col-chip-dim    { border-left: 2px solid var(--green); }
+.col-chip-date   { border-left: 2px solid var(--amber); }
+.col-chip-metric { border-left: 2px solid var(--accent); }
+
+.col-name { font-size: 11px; color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── Field groups ── */
+.field-group { margin-bottom: 12px; }
+
+.field-group-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  padding: 2px 2px 5px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid var(--border);
   color: var(--text3);
-  border: 1px solid var(--border);
+}
+.field-group-dim    .field-group-header,
+.field-group-dim    { }
+.field-group-header.field-group-dim    { color: var(--green); border-color: var(--green-l); }
+.field-group-header.field-group-metric { color: var(--accent); border-color: var(--accent-l); }
+
+/* Empty state when no dataset */
+.fields-empty {
+  font-size: 11px;
+  color: var(--text3);
+  padding: 12px 4px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ── Field-drag ghost on canvas ── */
+.field-drop-ghost {
+  position: absolute;
+  pointer-events: none;
+  width: 200px;
+  height: 90px;
+  border: 2px dashed var(--accent);
+  border-radius: var(--radius-lg);
+  background: rgba(0, 94, 184, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--accent);
+  z-index: 9000;
+  transform: translate(-16px, -16px);
+  opacity: .9;
 }
 
 .add-btn {

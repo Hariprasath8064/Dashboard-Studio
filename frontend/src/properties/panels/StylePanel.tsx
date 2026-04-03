@@ -19,7 +19,8 @@ export default function StylePanel({ widget }: any) {
   const dataset = useDashboardStore(s => s.dashboard.dataset)
   const [perBarOpen, setPerBarOpen] = useState(false)
 
-  const isBarOrDonut = widget.type === "bar" || widget.type === "donut"
+  const isBarOrDonut = widget.type === "bar" || widget.type === "donut" || widget.type === "pie" || widget.type === "timeline"
+  const isChartWithLegend = ["bar","line","donut","pie","timeline"].includes(widget.type)
 
   // Get bar labels from dataset if chart has columns set
   let barLabels: string[] = []
@@ -87,7 +88,8 @@ export default function StylePanel({ widget }: any) {
         <span style={{ fontSize: 11, color: 'var(--text3)', flex: 1 }}>{currentColor}</span>
       </div>
 
-      {/* Legend toggle */}
+      {/* Legend toggle — chart types only */}
+      {isChartWithLegend && (
       <div className="pp-row">
         <span className="pp-label">Legend</span>
         <div className="pp-toggle">
@@ -95,6 +97,7 @@ export default function StylePanel({ widget }: any) {
           <button className={`pp-toggle-btn${widget.showLegend === false ? ' on' : ''}`} onClick={() => updateWidget({ ...widget, showLegend: false })}>Off</button>
         </div>
       </div>
+      )}
 
       {/* Per-bar colors — only for bar/donut with data */}
       {isBarOrDonut && barLabels.length > 0 && (

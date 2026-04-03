@@ -44,6 +44,28 @@ export default function ComponentsPanel(){
     <circle cx="8" cy="8" r="3" fill="white"/>
    </svg>
   ),
+  pie: (
+   <svg viewBox="0 0 16 16" fill="none">
+    <circle cx="8" cy="8" r="6.5" stroke="#e2e8f0" strokeWidth="1"/>
+    <path d="M8 8L14.5 8A6.5 6.5 0 008 1.5Z" fill="#005EB8"/>
+    <path d="M8 8L14.5 8A6.5 6.5 0 0 1 3 13Z" fill="#16a34a" opacity=".7"/>
+    <path d="M8 8L3 13A6.5 6.5 0 0 1 8 1.5Z" fill="#f59e0b" opacity=".6"/>
+   </svg>
+  ),
+  gauge: (
+   <svg viewBox="0 0 16 16" fill="none">
+    <path d="M2 12a6 6 0 0112 0" stroke="#e2e8f0" strokeWidth="2.5" strokeLinecap="round"/>
+    <path d="M2 12a6 6 0 019-5.2" stroke="#005EB8" strokeWidth="2.5" strokeLinecap="round"/>
+    <circle cx="8" cy="12" r="1.5" fill="#005EB8"/>
+   </svg>
+  ),
+  timeline: (
+   <svg viewBox="0 0 16 16" fill="none">
+    <rect x="1"  y="3"  width="7"  height="2.5" rx=".8" fill="#005EB8"/>
+    <rect x="1"  y="7"  width="11" height="2.5" rx=".8" fill="#005EB8" opacity=".65"/>
+    <rect x="1"  y="11" width="5"  height="2.5" rx=".8" fill="#005EB8" opacity=".4"/>
+   </svg>
+  ),
   kpi: (
    <svg viewBox="0 0 16 16" fill="none">
     <rect x="2" y="4" width="12" height="8" rx="2" fill="#eff6ff" stroke="#005EB8" strokeWidth="1"/>
@@ -77,6 +99,9 @@ export default function ComponentsPanel(){
     {card("bar","Bar Chart",icons.bar)}
     {card("line","Line Chart",icons.line)}
     {card("donut","Donut",icons.donut)}
+    {card("pie","Pie Chart",icons.pie)}
+    {card("gauge","Gauge",icons.gauge)}
+    {card("timeline","Timeline",icons.timeline)}
    </div>
 
    <div className="section-label">Widgets</div>

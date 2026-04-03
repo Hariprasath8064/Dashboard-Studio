@@ -50,7 +50,8 @@ export default function BarChartWidget({ widget }: Props) {
 
       options: {
         responsive: true,
-        maintainAspectRatio: false
+        maintainAspectRatio: false,
+        plugins: { legend: { display: widget.showLegend !== false } }
       }
 
     })

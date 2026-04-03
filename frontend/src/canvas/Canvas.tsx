@@ -1,4 +1,4 @@
-import { useRef } from "react"
+import { useRef, useState, useEffect } from "react"
 import { useDashboardStore } from "../store/dashboardStore"
 import CanvasWidget from "./CanvasWidget"
 import CanvasGrid from "./CanvasGrid"
@@ -39,13 +39,80 @@ export default function Canvas(){
   bgStyle.backgroundColor = background?.color || "#ffffff"
  }
 
+ // ── Ghost state for field drags ──
+ const [fieldGhost, setFieldGhost] = useState<{
+  x: number; y: number
+  kind: "kpi" | "table" | "chart"
+ } | null>(null)
+
+ // Clear ghost whenever any drag ends (covers drop-on-widget case where
+ // stopPropagation prevents the canvas onDrop from running)
+ useEffect(() => {
+  const clear = () => setFieldGhost(null)
+  document.addEventListener("dragend", clear)
+  return () => document.removeEventListener("dragend", clear)
+ }, [])
+
+ function handleFieldDragOver(e: React.DragEvent) {
+  if (!e.dataTransfer.types.includes("dataset-column")) return
+  e.preventDefault()
+  const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect()
+  const x = Math.round((e.clientX - rect.left) / (zoom / 100))
+  const y = Math.round((e.clientY - rect.top)  / (zoom / 100))
+  setFieldGhost((prev) =>
+   prev?.x === x && prev?.y === y ? prev : { x, y, kind: "table" }
+  )
+ }
+
+ function handleFieldDragLeave(e: React.DragEvent) {
+  if (!(e.currentTarget as HTMLElement).contains(e.relatedTarget as Node)) {
+   setFieldGhost(null)
+  }
+ }
+
+ function dropFieldOnCanvas(colName: string, colType: string, x: number, y: number) {
+  const id = generateId("w")
+  const zIndex = Date.now()
+  if (colType === "number") {
+   addWidget({
+    id, type: "kpi",
+    position: { x, y },
+    size: { width: 200, height: 110 },
+    zIndex,
+    label: colName,
+    valueColumn: colName,
+    aggregation: "SUM"
+   } as any)
+  } else {
+   addWidget({
+    id, type: "table",
+    position: { x, y },
+    size: { width: 320, height: 240 },
+    zIndex,
+    columns: [colName]
+   } as any)
+  }
+ }
+
  function handleDrop(e:React.DragEvent){
   e.preventDefault()
-  const type = e.dataTransfer.getData("component-type")
-  if(!type) return
+  setFieldGhost(null)
+
   const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect()
   const x = (e.clientX - rect.left) / (zoom / 100)
   const y = (e.clientY - rect.top)  / (zoom / 100)
+
+  // ── Field drag from sidebar ──
+  const colName = e.dataTransfer.getData("dataset-column")
+  const colType = e.dataTransfer.getData("dataset-column-type")
+  if (colName) {
+   dropFieldOnCanvas(colName, colType, x, y)
+   return
+  }
+
+  // ── Component drag from sidebar ──
+  const type = e.dataTransfer.getData("component-type")
+  if(!type) return
   const base = {
    id: generateId("w"),
    type,
@@ -65,6 +132,11 @@ export default function Canvas(){
    addWidget({ ...base, columns:[] } as any)
    return
   }
+  if(type==="gauge"){
+   addWidget({ ...base, size:{ width:260, height:200 }, title:"Gauge", query:{ xColumn:"", yColumn:"", aggregation:"SUM" } } as any)
+   return
+  }
+  // bar, line, donut, pie, timeline
   addWidget({ ...base, title:"Chart", query:{ xColumn:"", yColumn:"", aggregation:"SUM" } } as any)
  }
 
@@ -207,7 +279,8 @@ export default function Canvas(){
        transformOrigin: "top left",
        ...bgStyle
       }}
-      onDragOver={(e) => e.preventDefault()}
+      onDragOver={(e) => { e.preventDefault(); handleFieldDragOver(e) }}
+      onDragLeave={handleFieldDragLeave}
       onDrop={handleDrop}
       onClick={() => clearSelection()}
      >
@@ -219,6 +292,19 @@ export default function Canvas(){
       ))}
 
       <SmartGuides />
+
+      {/* Field-drag ghost: shows a placeholder at cursor while hovering */}
+      {fieldGhost && (
+       <div
+        className="field-drop-ghost"
+        style={{ left: fieldGhost.x, top: fieldGhost.y }}
+       >
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+         <rect x="2" y="2" width="14" height="14" rx="3" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 2"/>
+        </svg>
+        Drop to create widget
+       </div>
+      )}
 
      </div>
 

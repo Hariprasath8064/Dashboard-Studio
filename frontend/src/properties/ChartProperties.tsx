@@ -28,10 +28,10 @@ export default function ChartProperties({ widget }: Props) {
 
   }
 
-  // Compute slice values for donut preview
+  // Compute slice values for donut/pie preview
   let donutSlices: { label: string; value: number; color: string }[] = []
   if (
-    widget.type === "donut" &&
+    (widget.type === "donut" || widget.type === "pie") &&
     dataset &&
     widget.query.xColumn &&
     widget.query.yColumn
@@ -135,7 +135,7 @@ export default function ChartProperties({ widget }: Props) {
 
       </div>
 
-      {widget.type === "donut" && donutSlices.length > 0 && (
+      {(widget.type === "donut" || widget.type === "pie") && donutSlices.length > 0 && (
         <div style={{ marginTop: 12 }}>
           <div className="pp-section-title" style={{ marginBottom: 6 }}>Slice Values</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
