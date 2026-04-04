@@ -205,13 +205,6 @@
   padding: 12px 8px;
 }
 
-.sf-fields-tab {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  padding-bottom: 8px;
-}
-
 .section-label {
   font-size: 10px;
   font-weight: 600;
@@ -653,84 +646,6 @@
   line-height: 1.6;
 }
 
-/* ── FIELDS PANEL (right collapsible) ── */
-.fields-panel {
-  flex-shrink: 0;
-  background: var(--surface);
-  border-left: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  transition: width .2s ease;
-  position: relative;
-}
-.fields-panel-open   { width: 230px; }
-.fields-panel-closed { width: 32px; }
-
-/* ── Collapse toggle ── */
-.fields-panel-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  flex-shrink: 0;
-  width: 100%;
-  height: 36px;
-  border: none;
-  background: transparent;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-  color: var(--text3);
-  transition: color .12s, background .12s;
-}
-.fields-panel-toggle:hover { background: var(--bg); color: var(--text); }
-
-.fp-collapsed-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 0 4px;
-  color: var(--text3);
-  opacity: 0.5;
-}
-
-/* ── Panel body ── */
-.fields-panel-body {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  overflow: hidden;
-  min-width: 0;
-}
-
-.fields-panel-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  height: 40px;
-  flex-shrink: 0;
-  padding: 0 12px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text);
-  border-bottom: 1px solid var(--border);
-}
-.fields-panel-title { flex: 1; }
-
-.fields-panel-count {
-  font-size: 10px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 9px;
-  background: var(--accent-l);
-  color: var(--accent);
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* ── Dataset stat card ── */
 .fp-dataset-card {
   margin: 10px 10px 0;
@@ -806,13 +721,6 @@
   color: var(--text3);
   padding: 5px 12px 2px;
   font-style: italic;
-}
-
-/* ── Scroll area ── */
-.fields-panel-scroll {
-  flex: 1;
-  overflow-y: auto;
-  padding: 8px 10px 16px;
 }
 
 /* ── Empty state ── */

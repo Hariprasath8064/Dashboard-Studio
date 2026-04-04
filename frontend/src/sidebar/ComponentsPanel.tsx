@@ -84,13 +84,6 @@ export default function ComponentsPanel(){
     <rect x="11.5" y="6" width="3.5" height="3" rx="0" fill="#005EB8" opacity=".5"/>
    </svg>
   ),
-  bubble: (
-   <svg viewBox="0 0 16 16" fill="none">
-    <circle cx="4"  cy="11" r="2.5" fill="#005EB8" opacity=".35"/>
-    <circle cx="11" cy="8"  r="4"   fill="#005EB8" opacity=".25"/>
-    <circle cx="6"  cy="5"  r="1.5" fill="#005EB8" opacity=".7"/>
-   </svg>
-  ),
   radar: (
    <svg viewBox="0 0 16 16" fill="none">
     <polygon points="8,1 15,6 13,14 3,14 1,6" stroke="#e2e8f0" strokeWidth="1" fill="none"/>

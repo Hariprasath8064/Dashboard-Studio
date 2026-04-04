@@ -3,15 +3,7 @@ import Chart from "chart.js/auto"
 import type { ChartWidget } from "../../types/widgetTypes"
 import { useDashboardStore } from "../../store/dashboardStore"
 import { runAggregation } from "../../dataset/QueryEngine"
-import { chartColors } from "../../constants/chartColors"
-
-function resolveColors(widget: ChartWidget, count: number): string[] {
-  if (Array.isArray(widget.barColors) && widget.barColors.length > 0) {
-    return Array.from({ length: count }, (_, i) => widget.barColors![i] || chartColors[i % chartColors.length])
-  }
-  if (widget.color) return Array(count).fill(widget.color)
-  return Array.from({ length: count }, (_, i) => chartColors[i % chartColors.length])
-}
+import { resolveColors } from "../../utils/chartHelpers"
 
 interface Props { widget: ChartWidget }
 

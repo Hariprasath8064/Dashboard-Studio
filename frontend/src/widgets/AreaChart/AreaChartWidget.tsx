@@ -3,7 +3,7 @@ import Chart from "chart.js/auto"
 import type { ChartWidget } from "../../types/widgetTypes"
 import { useDashboardStore } from "../../store/dashboardStore"
 import { runAggregation } from "../../dataset/QueryEngine"
-import { applyFilter, buildScalesConfig } from "../../utils/chartHelpers"
+import { applyFilter, buildScalesConfig, dataLabelPlugin } from "../../utils/chartHelpers"
 import { chartColors } from "../../constants/chartColors"
 
 interface Props { widget: ChartWidget }
@@ -72,25 +72,4 @@ export default function AreaChartWidget({ widget }: Props) {
       <canvas ref={canvasRef} />
     </div>
   )
-}
-
-const dataLabelPlugin = {
-  id: "dl",
-  afterDatasetDraw(chart: any) {
-    const { ctx } = chart
-    chart.data.datasets.forEach((_: any, i: number) => {
-      const meta = chart.getDatasetMeta(i)
-      meta.data.forEach((pt: any, idx: number) => {
-        const v = chart.data.datasets[i].data[idx]
-        if (v == null) return
-        ctx.save()
-        ctx.textAlign = "center"
-        ctx.textBaseline = "bottom"
-        ctx.fillStyle = "#374151"
-        ctx.font = "bold 10px Inter,sans-serif"
-        ctx.fillText(typeof v === "number" ? v.toLocaleString(undefined, { maximumFractionDigits: 1 }) : v, pt.x, pt.y - 4)
-        ctx.restore()
-      })
-    })
-  }
 }
