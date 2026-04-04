@@ -205,6 +205,13 @@
   padding: 12px 8px;
 }
 
+.sf-fields-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-bottom: 8px;
+}
+
 .section-label {
   font-size: 10px;
   font-weight: 600;
@@ -875,6 +882,35 @@
 
 .pp-empty-icon { opacity: .25; }
 
+.rp-view-tabs {
+  display: flex;
+  border-bottom: 2px solid var(--border);
+  background: var(--surface2, var(--surface));
+}
+
+.rp-view-tabs button {
+  flex: 1;
+  height: 34px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text2);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all .15s;
+  cursor: pointer;
+}
+
+.rp-view-tabs button:hover { color: var(--text); }
+
+.rp-view-tabs button.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+
 .props-tabs {
   display: flex;
   border-bottom: 1px solid var(--border);
@@ -1136,6 +1172,41 @@
   white-space: nowrap;
 }
 
+/* ── Conditional coloring rules ── */
+.pp-cond-rules {
+  padding: 6px 8px 8px;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pp-cond-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+}
+
+.pp-cond-del {
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: none;
+  color: var(--text3);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  flex-shrink: 0;
+  transition: color .12s, background .12s;
+}
+.pp-cond-del:hover { color: #dc2626; background: #fee2e2; }
+
 /* ── KPI AGG BUTTONS ── */
 .pp-agg-group {
   display: flex;
@@ -1237,9 +1308,8 @@
   border-bottom: 1px solid var(--border);
   color: var(--text3);
 }
-.field-group-dim    .field-group-header,
-.field-group-dim    { }
-.field-group-header.field-group-dim    { color: var(--green); border-color: var(--green-l); }
+.field-group-dim .field-group-header { color: var(--green); border-color: var(--green-l); }
+.field-group-header.field-group-metric { color: var(--accent); border-color: var(--accent-l); }
 .field-group-header.field-group-metric { color: var(--accent); border-color: var(--accent-l); }
 
 /* Empty state when no dataset */

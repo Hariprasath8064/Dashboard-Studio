@@ -9,6 +9,10 @@ export default function LayersPanel(){
  const typeColors: Record<string, string> = {
   bar: '#005EB8',
   line: '#0891b2',
+  area: '#06b6d4',
+  'stacked-bar': '#6366f1',
+  scatter: '#8b5cf6',
+  radar: '#f59e0b',
   donut: '#7c3aed',
   pie: '#f59e0b',
   gauge: '#06b6d4',
@@ -21,6 +25,10 @@ export default function LayersPanel(){
  const typeLabels: Record<string, string> = {
   bar: 'Bar Chart',
   line: 'Line Chart',
+  area: 'Area Chart',
+  'stacked-bar': 'Stacked Bar',
+  scatter: 'Scatter',
+  radar: 'Radar',
   donut: 'Donut',
   pie: 'Pie Chart',
   gauge: 'Gauge',

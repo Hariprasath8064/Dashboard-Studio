@@ -5,7 +5,7 @@ import LayersPanel from "../layout/LayersPanel"
 
 export default function Sidebar(){
 
- const [tab,setTab] = useState<"components"|"data"|"layers">("components")
+ const [tab, setTab] = useState<"components"|"data"|"layers">("components")
 
  return(
 
@@ -16,6 +16,7 @@ export default function Sidebar(){
     <button
      className={tab==="components"?"active":""}
      onClick={()=>setTab("components")}
+     title="Components"
     >
      Components
     </button>
@@ -23,6 +24,7 @@ export default function Sidebar(){
     <button
      className={tab==="data"?"active":""}
      onClick={()=>setTab("data")}
+     title="Data"
     >
      Data
     </button>
@@ -30,6 +32,7 @@ export default function Sidebar(){
     <button
      className={tab==="layers"?"active":""}
      onClick={()=>setTab("layers")}
+     title="Layers"
     >
      Layers
     </button>

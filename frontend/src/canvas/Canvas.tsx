@@ -136,7 +136,15 @@ export default function Canvas(){
    addWidget({ ...base, size:{ width:260, height:200 }, title:"Gauge", query:{ xColumn:"", yColumn:"", aggregation:"SUM" } } as any)
    return
   }
-  // bar, line, donut, pie, timeline
+  if(type==="scatter"){
+   addWidget({ ...base, title:"Scatter", query:{ xColumn:"", yColumn:"", aggregation:"SUM" } } as any)
+   return
+  }
+  if(type==="radar"){
+   addWidget({ ...base, title:"Radar", query:{ xColumn:"", yColumn:"", aggregation:"SUM" } } as any)
+   return
+  }
+  // bar, line, area, stacked-bar, donut, pie, timeline
   addWidget({ ...base, title:"Chart", query:{ xColumn:"", yColumn:"", aggregation:"SUM" } } as any)
  }
 

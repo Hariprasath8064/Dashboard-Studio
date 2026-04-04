@@ -1,8 +1,12 @@
-import type { DatasetQuery } from "./datasetTypes"
+import type { DatasetQuery, AggregationType } from "./datasetTypes"
 
 export type WidgetType =
   | "bar"
   | "line"
+  | "area"
+  | "stacked-bar"
+  | "scatter"
+  | "radar"
   | "donut"
   | "pie"
   | "gauge"
@@ -10,6 +14,12 @@ export type WidgetType =
   | "kpi"
   | "table"
   | "text"
+
+export interface ColorRule {
+  op: "lt" | "gt" | "lte" | "gte" | "eq"
+  value: number
+  color: string
+}
 
 export interface WidgetPosition {
 
@@ -50,6 +60,27 @@ export interface ChartWidget extends WidgetBase {
   barColors?: string[]
 
   showLegend?: boolean
+
+  // ── Dual Y-axis ──
+  y2Column?: string
+  y2Aggregation?: AggregationType
+  y2Color?: string
+  y2BarColors?: string[]
+
+  // ── Axis customization ──
+  xAxisLabel?: string
+  yAxisLabel?: string
+  axisFontSize?: number
+  xTickRotation?: number
+
+  // ── Data labels ──
+  showDataLabels?: boolean
+
+  // ── Conditional coloring ──
+  colorRules?: ColorRule[]
+
+  // ── Filter ──
+  filterTopN?: number
 
 }
 

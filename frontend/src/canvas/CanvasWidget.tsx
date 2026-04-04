@@ -10,13 +10,18 @@ import DonutWidget     from "../widgets/DonutChart/DonutWidget"
 import PieChartWidget  from "../widgets/PieChart/PieChartWidget"
 import GaugeWidget     from "../widgets/GaugeWidget/GaugeWidget"
 import TimelineWidget  from "../widgets/Timeline/TimelineWidget"
+import AreaChartWidget  from "../widgets/AreaChart/AreaChartWidget"
+import ScatterChartWidget from "../widgets/ScatterChart/ScatterChartWidget"
+import StackedBarWidget from "../widgets/StackedBar/StackedBarWidget"
+import RadarChartWidget  from "../widgets/RadarChart/RadarChartWidget"
 import KPIWidget       from "../widgets/KPIWidget/KPIWidget"
 import TableWidget     from "../widgets/TableWidget/TableWidget"
 import TextWidget      from "../widgets/TextWidget/TextWidget"
 import { snap, snapToEdges } from "../utils/snapGrid"
 
 const TYPE_ICON: Record<string, string> = {
-  bar: "▤", line: "↗", donut: "◎", pie: "◔", gauge: "◑", timeline: "≡",
+  bar: "▤", line: "↗", area: "△", "stacked-bar": "▦", scatter: "∷", radar: "☆",
+  donut: "◎", pie: "◔", gauge: "◑", timeline: "≡",
   kpi: "#", table: "⊞", text: "T"
 }
 
@@ -135,6 +140,8 @@ export default function CanvasWidget({ widget }: Props) {
     if (!column) return
 
     if (widget.type === "bar" || widget.type === "line" || widget.type === "donut" ||
+        widget.type === "area" || widget.type === "stacked-bar" || widget.type === "scatter" ||
+        widget.type === "radar" ||
         widget.type === "pie" || widget.type === "gauge" || widget.type === "timeline") {
       const chart = widget as any
       // numerics → Y axis, dimensions/dates → X axis
@@ -160,6 +167,10 @@ export default function CanvasWidget({ widget }: Props) {
     switch (w.type) {
       case "bar":       return <BarChartWidget  widget={w as any} />
       case "line":      return <LineChartWidget widget={w as any} />
+      case "area":      return <AreaChartWidget  widget={w as any} />
+      case "stacked-bar": return <StackedBarWidget widget={w as any} />
+      case "scatter":   return <ScatterChartWidget widget={w as any} />
+      case "radar":     return <RadarChartWidget   widget={w as any} />
       case "donut":     return <DonutWidget     widget={w as any} />
       case "pie":       return <PieChartWidget  widget={w as any} />
       case "gauge":     return <GaugeWidget     widget={w as any} />

@@ -228,6 +228,10 @@ function renderWidgetHTML(widget:any,columns:any[],rows:any[]){
  switch(widget?.type){
   case "bar":
   case "line":
+  case "area":
+  case "stacked-bar":
+  case "scatter":
+  case "radar":
   case "donut":
   case "pie":
   case "gauge":

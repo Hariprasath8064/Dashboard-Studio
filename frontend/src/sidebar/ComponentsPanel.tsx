@@ -59,6 +59,44 @@ export default function ComponentsPanel(){
     <circle cx="8" cy="12" r="1.5" fill="#005EB8"/>
    </svg>
   ),
+  area: (
+   <svg viewBox="0 0 16 16" fill="none">
+    <path d="M1 13L4 8l3 2.5L10 5l5 3V13H1Z" fill="#005EB8" opacity=".25"/>
+    <path d="M1 13L4 8l3 2.5L10 5l5 3" stroke="#005EB8" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+   </svg>
+  ),
+  scatter: (
+   <svg viewBox="0 0 16 16" fill="none">
+    <circle cx="3.5" cy="11" r="1.5" fill="#005EB8"/>
+    <circle cx="6.5" cy="7"  r="1.5" fill="#005EB8" opacity=".8"/>
+    <circle cx="10"  cy="9"  r="1.5" fill="#005EB8" opacity=".6"/>
+    <circle cx="13"  cy="4"  r="1.5" fill="#005EB8" opacity=".4"/>
+    <circle cx="8"   cy="12" r="1.5" fill="#005EB8" opacity=".7"/>
+   </svg>
+  ),
+  "stacked-bar": (
+   <svg viewBox="0 0 16 16" fill="none">
+    <rect x="1"   y="10" width="3.5" height="4" rx="1" fill="#005EB8"/>
+    <rect x="1"   y="7"  width="3.5" height="3" rx="0" fill="#005EB8" opacity=".5"/>
+    <rect x="6.25" y="8" width="3.5" height="6" rx="1" fill="#005EB8"/>
+    <rect x="6.25" y="4" width="3.5" height="4" rx="0" fill="#005EB8" opacity=".5"/>
+    <rect x="11.5" y="9" width="3.5" height="5" rx="1" fill="#005EB8"/>
+    <rect x="11.5" y="6" width="3.5" height="3" rx="0" fill="#005EB8" opacity=".5"/>
+   </svg>
+  ),
+  bubble: (
+   <svg viewBox="0 0 16 16" fill="none">
+    <circle cx="4"  cy="11" r="2.5" fill="#005EB8" opacity=".35"/>
+    <circle cx="11" cy="8"  r="4"   fill="#005EB8" opacity=".25"/>
+    <circle cx="6"  cy="5"  r="1.5" fill="#005EB8" opacity=".7"/>
+   </svg>
+  ),
+  radar: (
+   <svg viewBox="0 0 16 16" fill="none">
+    <polygon points="8,1 15,6 13,14 3,14 1,6" stroke="#e2e8f0" strokeWidth="1" fill="none"/>
+    <polygon points="8,4 12,7 10.5,12 5.5,12 4,7" fill="#005EB8" opacity=".25" stroke="#005EB8" strokeWidth="1.2"/>
+   </svg>
+  ),
   timeline: (
    <svg viewBox="0 0 16 16" fill="none">
     <rect x="1"  y="3"  width="7"  height="2.5" rx=".8" fill="#005EB8"/>
@@ -98,6 +136,10 @@ export default function ComponentsPanel(){
    <div className="comp-grid">
     {card("bar","Bar Chart",icons.bar)}
     {card("line","Line Chart",icons.line)}
+    {card("area","Area Chart",icons.area)}
+    {card("stacked-bar","Stacked Bar",icons["stacked-bar"])}
+    {card("scatter","Scatter",icons.scatter)}
+    {card("radar","Radar",icons.radar)}
     {card("donut","Donut",icons.donut)}
     {card("pie","Pie Chart",icons.pie)}
     {card("gauge","Gauge",icons.gauge)}
