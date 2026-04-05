@@ -3,6 +3,7 @@ import Chart from "chart.js/auto"
 import type { ChartWidget } from "../../types/widgetTypes"
 import { useDashboardStore } from "../../store/dashboardStore"
 import { chartColors } from "../../constants/chartColors"
+import { multiColorLegendLabels } from "../../utils/chartHelpers"
 
 interface Props { widget: ChartWidget }
 
@@ -64,7 +65,7 @@ export default function TimelineWidget({ widget }: Props) {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { display: widget.showLegend !== false },
+          legend: { display: widget.showLegend !== false, labels: multiColorLegendLabels },
         },
         scales: {
           x: { beginAtZero: true, grid: { color: "rgba(0,0,0,.05)" } },

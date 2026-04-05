@@ -59,6 +59,50 @@ export function resolveColors(widget: ChartWidget, count: number): string[] {
   return Array.from({ length: count }, (_, i) => chartColors[i % chartColors.length])
 }
 
+/**
+ * Chart.js legend `labels` config that works correctly when any dataset uses
+ * an array of distinct bar colours (e.g. default palette cycling).
+ * — Multi-colour dataset → one legend item per category with its bar colour
+ * — Single-colour dataset → one legend item for the dataset label
+ * Drop this into any bar / stacked-bar / timeline chart's `legend.labels`.
+ */
+export const multiColorLegendLabels = {
+  generateLabels(chart: any): any[] {
+    const chartLabels = (chart.data.labels || []) as string[]
+    const items: any[] = []
+    chart.data.datasets.forEach((ds: any, di: number) => {
+      const bg     = ds.backgroundColor
+      const bgArr  = Array.isArray(bg) ? (bg as string[]) : null
+      const isMulti = bgArr !== null && new Set(bgArr).size > 1
+      if (isMulti) {
+        chartLabels.forEach((text: string, i: number) => {
+          items.push({
+            text,
+            fillStyle:   bgArr![i] || bgArr![0] || "#2b7cff",
+            strokeStyle: "transparent",
+            lineWidth:   0,
+            hidden:      false,
+            datasetIndex: di,
+            index:       i,
+          })
+        })
+      } else {
+        const c = bgArr ? bgArr[0] : (typeof bg === "string" ? bg : (ds.borderColor || "#2b7cff"))
+        items.push({
+          text:        ds.label || "",
+          fillStyle:   c || "#2b7cff",
+          strokeStyle: "transparent",
+          lineWidth:   0,
+          hidden:      false,
+          datasetIndex: di,
+          index:       0,
+        })
+      }
+    })
+    return items
+  }
+}
+
 /** Shared data-label plugin for bar charts */
 export const dataLabelPlugin = {
   id: "dl",

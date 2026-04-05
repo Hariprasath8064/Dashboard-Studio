@@ -3,7 +3,7 @@ import Chart from "chart.js/auto"
 import type { ChartWidget } from "../../types/widgetTypes"
 import { useDashboardStore } from "../../store/dashboardStore"
 import { runAggregation } from "../../dataset/QueryEngine"
-import { applyFilter, resolveConditionalColors, dataLabelPlugin, buildScalesConfig } from "../../utils/chartHelpers"
+import { applyFilter, resolveConditionalColors, dataLabelPlugin, buildScalesConfig, multiColorLegendLabels } from "../../utils/chartHelpers"
 import { chartColors } from "../../constants/chartColors"
 
 interface Props {
@@ -28,7 +28,6 @@ export default function BarChartWidget({ widget }: Props) {
     result = applyFilter(result, widget)
 
     const colors = resolveConditionalColors(widget, result.values)
-    const hasPerBar = Array.isArray(widget.barColors) && widget.barColors.length > 0
 
     // Dual Y-axis second dataset
     const datasets: any[] = [{
@@ -64,26 +63,7 @@ export default function BarChartWidget({ widget }: Props) {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            display: widget.showLegend !== false,
-            ...(hasPerBar ? {
-              labels: {
-                generateLabels(chart: any) {
-                  const bg: string[] = Array.isArray(chart.data.datasets[0]?.backgroundColor)
-                    ? chart.data.datasets[0].backgroundColor as string[]
-                    : []
-                  return (chart.data.labels as string[]).map((text, i) => ({
-                    text,
-                    fillStyle: bg[i] || bg[0] || "#2b7cff",
-                    strokeStyle: "transparent",
-                    hidden: false,
-                    datasetIndex: 0,
-                    index: i,
-                  }))
-                }
-              }
-            } : {})
-          }
+          legend: { display: widget.showLegend !== false, labels: multiColorLegendLabels },
         },
         scales,
       },

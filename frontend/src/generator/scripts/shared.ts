@@ -77,3 +77,11 @@ export function buildScalesOpts(widget: any, extra: Record<string, any> = {}) {
 }
 
 export const DATA_LABEL_PLUGIN_SRC = `{id:"dl",afterDatasetDraw(c){const{ctx}=c;c.data.datasets.forEach((_,i)=>{const m=c.getDatasetMeta(i);m.data.forEach((b,j)=>{const v=c.data.datasets[i].data[j];if(v==null||v===0)return;ctx.save();ctx.textAlign="center";ctx.textBaseline="bottom";ctx.fillStyle="#374151";ctx.font="bold 10px Inter,sans-serif";ctx.fillText(typeof v==="number"?v.toLocaleString(undefined,{maximumFractionDigits:1}):v,b.x,b.y-3);ctx.restore();})})}}`
+
+/**
+ * Inlinable generateLabels for the HTML export.
+ * Multi-colour dataset  → one legend item per category with its bar colour.
+ * Single-colour dataset → one legend item for the dataset label.
+ * Use as: `{display:...,labels:${MULTI_COLOR_LEGEND_SRC}}`
+ */
+export const MULTI_COLOR_LEGEND_SRC = `{generateLabels(c){const lb=(c.data.labels||[]);const items=[];c.data.datasets.forEach((ds,di)=>{const bg=ds.backgroundColor;const ba=Array.isArray(bg)?bg:null;const multi=ba&&new Set(ba).size>1;if(multi){lb.forEach((t,i)=>{items.push({text:String(t),fillStyle:ba[i]||ba[0]||"#2b7cff",strokeStyle:"transparent",lineWidth:0,hidden:false,datasetIndex:di,index:i});});}else{const col=ba?ba[0]:(typeof bg==="string"?bg:(ds.borderColor||"#2b7cff"));items.push({text:ds.label||"",fillStyle:col||"#2b7cff",strokeStyle:"transparent",lineWidth:0,hidden:false,datasetIndex:di,index:0});}});return items;}}`

@@ -3,7 +3,7 @@ import Chart from "chart.js/auto"
 import type { ChartWidget } from "../../types/widgetTypes"
 import { useDashboardStore } from "../../store/dashboardStore"
 import { runAggregation } from "../../dataset/QueryEngine"
-import { applyFilter, resolveConditionalColors, dataLabelPlugin } from "../../utils/chartHelpers"
+import { applyFilter, resolveConditionalColors, dataLabelPlugin, multiColorLegendLabels } from "../../utils/chartHelpers"
 import { chartColors } from "../../constants/chartColors"
 
 interface Props { widget: ChartWidget }
@@ -54,7 +54,7 @@ export default function StackedBarWidget({ widget }: Props) {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { display: widget.showLegend !== false },
+          legend: { display: widget.showLegend !== false, labels: multiColorLegendLabels },
         },
         scales: {
           x: {

@@ -1,6 +1,6 @@
 import { runAggregation } from "../../dataset/QueryEngine"
 import { chartColors } from "../../constants/chartColors"
-import { DEFAULT_COLOR, resolveConditionalColors, resolveColors, applyFilter, buildScalesOpts, DATA_LABEL_PLUGIN_SRC } from "./shared"
+import { DEFAULT_COLOR, resolveConditionalColors, resolveColors, applyFilter, buildScalesOpts, DATA_LABEL_PLUGIN_SRC, MULTI_COLOR_LEGEND_SRC } from "./shared"
 
 export function buildBarScript(widget: any, dataset: any): string {
   let result = runAggregation(dataset, widget.query.xColumn, widget.query.yColumn, widget.query.aggregation)
@@ -17,15 +17,10 @@ export function buildBarScript(widget: any, dataset: any): string {
     datasets.push({ label: widget.y2Column, data: r2.values, backgroundColor: y2Colors, borderWidth: 0, yAxisID: "y2", type: "bar" })
   }
 
-  const hasDualY  = !!widget.y2Column
-  const hasPerBar = Array.isArray(widget.barColors) && widget.barColors.length > 0
-  const scales    = buildScalesOpts(widget, { y2: hasDualY ? {} : undefined })
-  const plugins   = widget.showDataLabels ? `[${DATA_LABEL_PLUGIN_SRC}]` : "[]"
-
-  const legendStr = hasPerBar
-    ? `{display:${widget.showLegend !== false},labels:{generateLabels(c){const bg=Array.isArray(c.data.datasets[0]?.backgroundColor)?c.data.datasets[0].backgroundColor:[];return(c.data.labels||[]).map((l,i)=>({text:String(l),fillStyle:bg[i]||bg[0]||"#2b7cff",strokeStyle:"transparent",hidden:false,datasetIndex:0}));}}}`
-    : `{display:${widget.showLegend !== false}}`
-  const optsStr = `{responsive:true,maintainAspectRatio:false,plugins:{legend:${legendStr}},scales:${JSON.stringify(scales)}}`
+  const hasDualY = !!widget.y2Column
+  const scales   = buildScalesOpts(widget, { y2: hasDualY ? {} : undefined })
+  const plugins  = widget.showDataLabels ? `[${DATA_LABEL_PLUGIN_SRC}]` : "[]"
+  const optsStr  = `{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:${widget.showLegend !== false},labels:${MULTI_COLOR_LEGEND_SRC}}},scales:${JSON.stringify(scales)}}`
 
   return `
  {

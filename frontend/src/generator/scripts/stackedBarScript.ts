@@ -1,6 +1,6 @@
 import { runAggregation } from "../../dataset/QueryEngine"
 import { chartColors } from "../../constants/chartColors"
-import { resolveConditionalColors, applyFilter, buildScalesOpts, DATA_LABEL_PLUGIN_SRC } from "./shared"
+import { resolveConditionalColors, applyFilter, buildScalesOpts, DATA_LABEL_PLUGIN_SRC, MULTI_COLOR_LEGEND_SRC } from "./shared"
 
 export function buildStackedBarScript(widget: any, dataset: any): string {
   let result = runAggregation(dataset, widget.query.xColumn, widget.query.yColumn, widget.query.aggregation)
@@ -18,16 +18,12 @@ export function buildStackedBarScript(widget: any, dataset: any): string {
   }
 
   const scaleOpts = buildScalesOpts(widget, { x: { stacked: true }, y: { stacked: true } })
-  const opts = {
-    responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { display: widget.showLegend !== false } },
-    scales: scaleOpts
-  }
-  const plugins = widget.showDataLabels ? `[${DATA_LABEL_PLUGIN_SRC}]` : "[]"
+  const plugins   = widget.showDataLabels ? `[${DATA_LABEL_PLUGIN_SRC}]` : "[]"
+  const optsStr   = `{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:${widget.showLegend !== false},labels:${MULTI_COLOR_LEGEND_SRC}}},scales:${JSON.stringify(scaleOpts)}}`
 
   return `
  {
   const ctx=document.getElementById("chart-${widget.id}");
-  if(ctx){ new Chart(ctx,{ type:"bar", data:{ labels:${JSON.stringify(result.labels)}, datasets:${JSON.stringify(datasets)} }, options:${JSON.stringify(opts)}, plugins:${plugins} }); }
+  if(ctx){ new Chart(ctx,{ type:"bar", data:{ labels:${JSON.stringify(result.labels)}, datasets:${JSON.stringify(datasets)} }, options:${optsStr}, plugins:${plugins} }); }
  }`
 }
