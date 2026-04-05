@@ -1,0 +1,213 @@
+/* ═══════════════════════════════════════════════
+   FIELDS / DATASET PANEL  (fp-*, col-chip, field-group, add-btn, ghost)
+═══════════════════════════════════════════════ */
+
+/* ── Dataset stat card ── */
+.fp-dataset-card {
+  margin: 10px 10px 0;
+  padding: 8px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.fp-dataset-name {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 5px;
+}
+
+.fp-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.fp-stat {
+  font-size: 10.5px;
+  color: var(--text3);
+}
+
+.fp-stat b { color: var(--text2); font-weight: 600; }
+.fp-stat-dim    b { color: var(--green); }
+.fp-stat-metric b { color: var(--accent); }
+.fp-stat-sep { color: var(--border2); font-size: 10px; }
+
+/* ── Search ── */
+.fp-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 10px 0;
+  padding: 0 8px;
+  height: 28px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color .12s;
+}
+
+.fp-search-wrap:focus-within { border-color: var(--accent); }
+.fp-search-icon { color: var(--text3); flex-shrink: 0; }
+
+.fp-search {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 11px;
+  color: var(--text);
+  outline: none;
+  min-width: 0;
+}
+
+.fp-search-clear {
+  border: none;
+  background: none;
+  color: var(--text3);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+}
+
+.fp-search-clear:hover { color: var(--text); }
+
+/* ── Drag hint ── */
+.fp-hint {
+  font-size: 10px;
+  color: var(--text3);
+  padding: 5px 12px 2px;
+  font-style: italic;
+}
+
+/* ── Empty state ── */
+.fp-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--text3);
+  font-size: 11px;
+  text-align: center;
+  padding: 24px 16px;
+  line-height: 1.6;
+}
+
+/* ── Field chip ── */
+.col-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 8px 0 7px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 4px;
+  cursor: grab;
+  user-select: none;
+  transition: border-color .12s, background .12s;
+}
+
+.col-chip:hover { border-color: var(--border2); background: var(--surface); }
+.col-chip:active { cursor: grabbing; }
+
+.col-chip-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Icon color per role */
+.col-chip-dim    .col-chip-icon { color: var(--green); }
+.col-chip-date   .col-chip-icon { color: var(--amber); }
+.col-chip-metric .col-chip-icon { color: var(--accent); }
+
+/* Subtle left border accent per role */
+.col-chip-dim    { border-left: 2px solid var(--green); }
+.col-chip-date   { border-left: 2px solid var(--amber); }
+.col-chip-metric { border-left: 2px solid var(--accent); }
+
+.col-name { font-size: 11px; color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── Field groups ── */
+.field-group { margin-bottom: 12px; }
+
+.field-group-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  padding: 2px 2px 5px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text3);
+}
+
+.field-group-dim .field-group-header        { color: var(--green); border-color: var(--green-l); }
+.field-group-header.field-group-metric       { color: var(--accent); border-color: var(--accent-l); }
+
+/* Empty state when no dataset */
+.fields-empty {
+  font-size: 11px;
+  color: var(--text3);
+  padding: 12px 4px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ── Field-drag ghost on canvas ── */
+.field-drop-ghost {
+  position: absolute;
+  pointer-events: none;
+  width: 200px;
+  height: 90px;
+  border: 2px dashed var(--accent);
+  border-radius: var(--radius-lg);
+  background: rgba(0, 94, 184, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--accent);
+  z-index: 9000;
+  transform: translate(-16px, -16px);
+  opacity: .9;
+}
+
+/* ── Add button ── */
+.add-btn {
+  width: 100%;
+  height: 28px;
+  border: 1px dashed var(--border2);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text2);
+  font-size: 11px;
+  margin-top: 4px;
+  transition: all .15s;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.add-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-l);
+  border-style: solid;
+}

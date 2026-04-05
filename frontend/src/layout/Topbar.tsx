@@ -152,7 +152,7 @@ export default function Topbar({ view, setView }: Props) {
         onClick={exportDashboard}
       >
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 10h8M6 8V2M3 5l3 3 3-3" stroke="white" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
-        Export ZIP
+        Export HTML
       </button>
 
     </div>

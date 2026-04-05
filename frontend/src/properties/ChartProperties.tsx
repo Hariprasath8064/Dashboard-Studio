@@ -138,13 +138,6 @@ export default function ChartProperties({ widget }: Props) {
                   <option value="MAX">MAX</option>
                 </select>
               </div>
-              <div className="pp-row">
-                <span className="pp-label">2nd Color</span>
-                <input type="color" value={widget.y2Color || "#16a34a"}
-                  style={{ width: 28, height: 28, border: "1px solid var(--border)", borderRadius: "var(--radius)", cursor: "pointer", padding: 2 }}
-                  onChange={(e) => set("y2Color", e.target.value)} />
-                <span style={{ fontSize: 11, color: "var(--text3)", flex: 1 }}>{widget.y2Color || "#16a34a"}</span>
-              </div>
             </>
           )}
         </>

@@ -1,0 +1,239 @@
+/* ═══════════════════════════════════════════════
+   CANVAS  (canvas area, toolbar, frame, grid, trash, drag ghost)
+═══════════════════════════════════════════════ */
+
+/* ── CANVAS AREA ── */
+#canvas-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* ── CANVAS TOOLBAR ── */
+#canvas-toolbar {
+  height: 36px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.ct-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 9px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text2);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .12s, color .12s, border-color .12s;
+  white-space: nowrap;
+  font-family: var(--font);
+}
+
+.ct-btn:hover {
+  background: var(--hover);
+  color: var(--text1);
+}
+
+.ct-btn.active {
+  background: rgba(0,94,184,.08);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.ct-btn.ct-icon {
+  padding: 0 7px;
+  min-width: 26px;
+  justify-content: center;
+}
+
+.ct-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ct-zoom-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text1);
+  min-width: 32px;
+  text-align: center;
+  font-family: var(--font);
+  font-variant-numeric: tabular-nums;
+}
+
+.ct-div {
+  width: 1px;
+  height: 16px;
+  background: var(--border);
+  margin: 0 4px;
+}
+
+#canvas-scroll {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 32px;
+}
+
+/* ── CANVAS FRAME ── */
+#canvas-frame {
+  position: relative;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: 0 0 0 1px var(--border), var(--shadow-lg);
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+.grid-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.grid-col {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(0,94,184,.03);
+  border-left: 1px dashed rgba(0,94,184,.1);
+}
+
+/* ── TRASH ZONE ── */
+.trash-orb {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s, background 0.2s, border-color 0.2s;
+  z-index: 1200;
+}
+
+.trash-glow {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(220,38,38,.18) 0%, transparent 70%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+@keyframes trash-wobble {
+  0%   { transform: scale(1.28) rotate(0deg); }
+  20%  { transform: scale(1.28) rotate(-6deg); }
+  40%  { transform: scale(1.28) rotate(5deg); }
+  60%  { transform: scale(1.28) rotate(-3deg); }
+  80%  { transform: scale(1.28) rotate(2deg); }
+  100% { transform: scale(1.28) rotate(0deg); }
+}
+
+.trash-orb.active {
+  animation: trash-wobble 0.5s ease both;
+  box-shadow: 0 0 0 4px rgba(220,38,38,.15), 0 14px 32px rgba(220,38,38,.4);
+  background: #fff5f5;
+  border-color: var(--red);
+}
+
+.trash-orb.active .trash-glow { opacity: 1; }
+
+.trash-bin {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.trash-lid {
+  width: 32px;
+  height: 8px;
+  border-radius: 6px 6px 2px 2px;
+  background: #f87171;
+  transition: transform 0.25s cubic-bezier(.34,1.56,.64,1);
+  transform-origin: 50% 100%;
+}
+
+.trash-orb.active .trash-lid {
+  transform: translateY(-6px) rotate(-25deg);
+}
+
+.trash-hinge {
+  width: 14px;
+  height: 2px;
+  border-radius: 1px;
+  background: #fecaca;
+  position: absolute;
+  top: 2px;
+}
+
+.trash-body {
+  width: 34px;
+  height: 28px;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #f87171 0%, #ef4444 100%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 6px 8px;
+}
+
+.trash-body-bar {
+  width: 4px;
+  height: 100%;
+  border-radius: 2px;
+  background: rgba(255,255,255,.7);
+}
+
+/* ── WIDGET DRAG — ghost pill + dragging state ── */
+.widget.is-dragging {
+  opacity: 0.4;
+  cursor: grabbing;
+}
+
+.widget-drag-ghost {
+  position: fixed;
+  transform: translate(-50%, calc(-100% - 10px));
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: #ffffff;
+  border: 1.5px solid var(--accent);
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  pointer-events: none;
+  z-index: 99999;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent);
+  white-space: nowrap;
+  max-width: 200px;
+}
