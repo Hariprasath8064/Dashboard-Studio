@@ -1,0 +1,21 @@
+# Environment variables (contains secrets / local config)
+.env
+.env.*
+
+# SQLite database files
+*.db
+*.db-shm
+*.db-wal
+
+# Compiled binary
+*.exe
+dashboard-builder
+dashboard-builder.exe
+
+# Go build cache / test artifacts
+*.test
+*.out
+
+# OS
+.DS_Store
+Thumbs.db

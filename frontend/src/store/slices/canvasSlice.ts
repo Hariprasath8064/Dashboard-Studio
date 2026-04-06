@@ -6,6 +6,14 @@ import type { Dataset } from "../../types/datasetTypes"
 export function createCanvasSlice(set: any) {
   return {
 
+    // IDs of the records saved to the backend (null = never saved)
+    savedDashboardId: null as string | null,
+    savedDatasetId:   null as string | null,
+
+    setSavedDashboardId: (id: string | null) => set(() => ({ savedDashboardId: id })),
+    setSavedDatasetId:   (id: string | null) => set(() => ({ savedDatasetId:   id })),
+
+
     updateCanvas: (patch: Partial<{ width: number; height: number }>) =>
       set((state: any) => ({
         dashboard: { ...state.dashboard, canvas: { ...state.dashboard.canvas, ...patch } },
@@ -16,10 +24,11 @@ export function createCanvasSlice(set: any) {
         dashboard: { ...state.dashboard, background: { ...state.dashboard.background, ...bg } },
       })),
 
-    setDataset: (dataset: Dataset, name: string) =>
+    setDataset: (dataset: Dataset, name: string, datasetId?: string | null) =>
       set((state: any) => ({
-        dashboard:   { ...state.dashboard, dataset },
-        datasetName: name,
+        dashboard:      { ...state.dashboard, dataset },
+        datasetName:    name,
+        savedDatasetId: datasetId !== undefined ? datasetId : state.savedDatasetId,
       })),
 
     setZoom: (zoom: number) => set(() => ({ zoom })),

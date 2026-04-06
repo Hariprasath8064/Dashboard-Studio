@@ -188,3 +188,31 @@
   font-size: 11px;
   color: var(--text3);
 }
+
+/* Saved datasets list */
+.saved-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: var(--radius);
+  font-size: 12px;
+  cursor: pointer;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  transition: background 0.1s;
+}
+.saved-item:hover { background: var(--accent-l); border-color: var(--accent); }
+.saved-item.active { border-color: var(--accent); color: var(--accent); font-weight: 500; }
+.saved-item-del {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--text3);
+  padding: 0 2px;
+}
+.saved-item-del:hover { color: var(--red); }

@@ -1,24 +1,62 @@
-import { useRef, useState } from "react"
+import { useRef, useState, useEffect } from "react"
 import { loadDataset } from "../services/DatasetService"
+import { datasetApi, type SavedDatasetMeta } from "../services/datasetApi"
 import { useDashboardStore } from "../store/dashboardStore"
 
 export default function DatasetPanel() {
 
-  const setDataset = useDashboardStore((s) => s.setDataset)
-  const datasetName = useDashboardStore((s) => s.datasetName)
-  const dataset = useDashboardStore((s) => s.dashboard.dataset)
-  const [dragging, setDragging] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const setDataset          = useDashboardStore((s) => s.setDataset)
+  const setSavedDatasetId   = useDashboardStore((s) => s.setSavedDatasetId)
+  const datasetName         = useDashboardStore((s) => s.datasetName)
+  const dataset             = useDashboardStore((s) => s.dashboard.dataset)
+  const savedDatasetId      = useDashboardStore((s) => s.savedDatasetId)
+  const [dragging, setDragging]         = useState(false)
+  const [loading, setLoading]           = useState(false)
+  const [savedDatasets, setSavedDatasets] = useState<SavedDatasetMeta[]>([])
+  const [listOpen, setListOpen]         = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    datasetApi.list().then(setSavedDatasets).catch(() => {})
+  }, [])
 
   async function processFile(file: File) {
     setLoading(true)
     try {
       const result = await loadDataset(file)
-      setDataset(result, file.name)
+      // Try to persist to backend; fall back silently if backend is offline.
+      let remoteId: string | null = savedDatasetId
+      try {
+        const saved = await datasetApi.save(file.name, result)
+        remoteId = saved.id
+        setSavedDatasets((prev) => [saved, ...prev.filter((d) => d.id !== saved.id)])
+      } catch { /* offline / backend not running — continue locally */ }
+      setDataset(result, file.name, remoteId)
     } finally {
       setLoading(false)
     }
+  }
+
+  async function loadSaved(meta: SavedDatasetMeta) {
+    setLoading(true)
+    try {
+      const row = await datasetApi.get(meta.id)
+      const parsed = JSON.parse(row.data)
+      setDataset(parsed, meta.name, meta.id)
+      setSavedDatasetId(meta.id)
+    } catch (err) {
+      console.error("Failed to load dataset", err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function deleteDataset(id: string, e: React.MouseEvent) {
+    e.stopPropagation()
+    try {
+      await datasetApi.delete(id)
+      setSavedDatasets((prev) => prev.filter((d) => d.id !== id))
+    } catch { /* ignore */ }
   }
 
   async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -92,6 +130,41 @@ export default function DatasetPanel() {
         )}
 
       </div>
+
+      {savedDatasets.length > 0 && (
+        <div style={{ marginTop: 12 }}>
+          <button
+            className="section-label"
+            onClick={() => setListOpen((o) => !o)}
+            style={{ display: "flex", alignItems: "center", gap: 4, background: "none", border: "none", cursor: "pointer", padding: 0, color: "inherit", width: "100%" }}
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" style={{ transform: listOpen ? "rotate(90deg)" : "none", transition: "transform .15s" }}>
+              <path d="M4 2l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+            </svg>
+            Saved Datasets ({savedDatasets.length})
+          </button>
+
+          {listOpen && (
+            <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 4 }}>
+              {savedDatasets.map((meta) => (
+                <div
+                  key={meta.id}
+                  className={`saved-item${meta.id === savedDatasetId ? " active" : ""}`}
+                  onClick={() => loadSaved(meta)}
+                  title={`${meta.row_count} rows · ${meta.col_count} cols`}
+                >
+                  <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{meta.name}</span>
+                  <button
+                    className="saved-item-del"
+                    onClick={(e) => deleteDataset(meta.id, e)}
+                    title="Delete"
+                  >×</button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
     </div>
 

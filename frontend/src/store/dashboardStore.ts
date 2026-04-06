@@ -43,15 +43,19 @@ interface DashboardStore extends DashboardState {
 
   // ── canvas / settings ──
   datasetName: string | null
+  savedDashboardId: string | null
+  savedDatasetId:   string | null
   zoom: number
   showGrid: boolean
   updateCanvas: (patch: Partial<{ width: number; height: number }>) => void
   setCanvasBg: (bg: Partial<CanvasBackground>) => void
-  setDataset: (dataset: Dataset, name: string) => void
+  setDataset: (dataset: Dataset, name: string, datasetId?: string | null) => void
   setZoom: (zoom: number) => void
   setShowGrid: (show: boolean) => void
   renameDashboard: (name: string) => void
   resetDashboard: (data: DashboardState["dashboard"]) => void
+  setSavedDashboardId: (id: string | null) => void
+  setSavedDatasetId:   (id: string | null) => void
 
 }
 

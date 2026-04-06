@@ -153,6 +153,60 @@
   background: var(--accent-h);
 }
 
+.tb-btn.success { background: var(--green-l); border-color: var(--green); color: var(--green); }
+.tb-btn.danger  { background: var(--red-l);   border-color: var(--red);   color: var(--red);  }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.35);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+}
+.modal-box {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 520px; max-width: 95vw;
+  max-height: 80vh;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-title { font-size: 13px; font-weight: 600; }
+.modal-close {
+  background: none; border: none; cursor: pointer;
+  font-size: 18px; color: var(--text2); line-height: 1;
+  padding: 0 2px;
+}
+.modal-close:hover { color: var(--text); }
+.modal-body { padding: 12px 18px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+
+/* Gallery items */
+.gallery-empty { font-size: 13px; color: var(--text2); padding: 20px 0; text-align: center; }
+.gallery-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background .1s, border-color .1s;
+}
+.gallery-item:hover { background: var(--accent-l); border-color: var(--accent); }
+.gallery-item.loading { opacity: .6; pointer-events: none; }
+.gallery-item-icon { color: var(--text2); flex-shrink: 0; }
+.gallery-item:hover .gallery-item-icon { color: var(--accent); }
+.gallery-item-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.gallery-item-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gallery-item-sub  { font-size: 11px; color: var(--text2); }
+.gallery-item-date { font-size: 11px; color: var(--text3); flex-shrink: 0; }
+.gallery-item-del  { background: none; border: none; cursor: pointer; font-size: 15px; color: var(--text3); padding: 0 3px; flex-shrink: 0; }
+.gallery-item-del:hover { color: var(--red); }
+
 /* ── BODY ROW ── */
 .main-layout {
   display: flex;
