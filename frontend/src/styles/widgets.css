@@ -250,6 +250,14 @@
   padding: 16px;
 }
 
+/* ── GAUGE SUB-TEXT ── */
+.gauge-subtext {
+  padding: 4px 10px 6px;
+  line-height: 1.45;
+  word-break: break-word;
+  flex-shrink: 0;
+}
+
 /* ── TEXT WIDGET ── */
 .text-inner {
   padding: 16px 18px;

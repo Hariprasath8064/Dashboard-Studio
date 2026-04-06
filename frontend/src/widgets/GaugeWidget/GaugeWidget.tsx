@@ -78,6 +78,20 @@ export default function GaugeWidget({ widget }: Props) {
     <div className="chart-inner">
       <div className="wg-title">{widget.title}</div>
       <canvas ref={canvasRef} />
+      {widget.gaugeText && (
+        <div
+          className="gauge-subtext"
+          style={{
+            fontSize:   widget.gaugeTextSize  || 12,
+            color:      widget.gaugeTextColor || "#64748b",
+            textAlign:  widget.gaugeTextAlign || "center",
+            fontWeight: widget.gaugeTextBold   ? 700  : 400,
+            fontStyle:  widget.gaugeTextItalic ? "italic" : "normal",
+          }}
+        >
+          {widget.gaugeText}
+        </div>
+      )}
     </div>
   )
 }

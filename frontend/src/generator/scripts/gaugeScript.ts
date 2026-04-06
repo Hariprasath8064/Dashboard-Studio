@@ -21,6 +21,17 @@ export function buildGaugeScript(widget: any, dataset: any): string {
     plugins: { legend: { display: false }, tooltip: { enabled: false } }
   }
 
+  // Optional sub-text block
+  const hasText    = !!widget.gaugeText
+  const textSize   = widget.gaugeTextSize  || 12
+  const textColor  = widget.gaugeTextColor || "#64748b"
+  const textAlign  = widget.gaugeTextAlign || "center"
+  const textWeight = widget.gaugeTextBold   ? "700"    : "400"
+  const textStyle  = widget.gaugeTextItalic ? "italic" : "normal"
+  const subTextEl  = hasText
+    ? `<div style="font-size:${textSize}px;color:${textColor};text-align:${textAlign};font-weight:${textWeight};font-style:${textStyle};padding:4px 8px 6px;">${widget.gaugeText.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>`
+    : ""
+
   return `
  {
   const ctx=document.getElementById("chart-${widget.id}");
@@ -31,6 +42,7 @@ export function buildGaugeScript(widget: any, dataset: any): string {
     options:${JSON.stringify(opts)},
     plugins:[{id:"gl",afterDraw(c){const{ctx:x,chartArea:{top,bottom,left,right}}=c;const cx=(left+right)/2,cy=bottom-(bottom-top)*0.08;x.save();x.textAlign="center";x.textBaseline="middle";x.font="bold 20px Inter,sans-serif";x.fillStyle=${JSON.stringify(accent)};x.fillText("${Math.round(pct)}%",cx,cy-10);x.font="11px Inter,sans-serif";x.fillStyle="#94a3b8";x.fillText(${JSON.stringify(label)},cx,cy+14);x.restore();}}]
    });
+   ${hasText ? `const host=ctx.closest(".widget-body")||ctx.parentElement;if(host&&!host.querySelector(".gauge-sub")){const d=document.createElement("div");d.className="gauge-sub";d.innerHTML=${JSON.stringify(subTextEl)};host.appendChild(d);}` : ""}
   }
  }`
 }

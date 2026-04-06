@@ -82,6 +82,14 @@ export interface ChartWidget extends WidgetBase {
   // ── Filter ──
   filterTopN?: number
 
+  // ── Gauge sub-text ──
+  gaugeText?: string
+  gaugeTextSize?: number
+  gaugeTextColor?: string
+  gaugeTextAlign?: "left" | "center" | "right"
+  gaugeTextBold?: boolean
+  gaugeTextItalic?: boolean
+
 }
 
 export interface KPIWidget extends WidgetBase {

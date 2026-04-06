@@ -156,6 +156,64 @@ export default function ChartProperties({ widget }: Props) {
         </>
       )}
 
+      {/* ── Gauge sub-text ── */}
+      {widget.type === "gauge" && (
+        <>
+          <div className="pp-section-title" style={{ marginTop: 14 }}>Sub-text (optional)</div>
+
+          <div className="pp-row">
+            <span className="pp-label">Text</span>
+            <input
+              className="pp-input"
+              placeholder="e.g. Target: Q4 Revenue"
+              value={widget.gaugeText || ""}
+              onChange={e => set("gaugeText", e.target.value || undefined)}
+            />
+          </div>
+
+          {widget.gaugeText && (
+            <>
+              <div className="pp-row">
+                <span className="pp-label">Size</span>
+                <input className="pp-input small" type="number" min={8} max={32}
+                  value={widget.gaugeTextSize || 12}
+                  onChange={e => set("gaugeTextSize", Number(e.target.value))} />
+                <span className="pp-label" style={{ marginLeft: 6 }}>Color</span>
+                <input type="color" value={widget.gaugeTextColor || "#64748b"}
+                  style={{ width: 28, height: 28, border: "1px solid var(--border)", borderRadius: "var(--radius)", cursor: "pointer", padding: 2, flexShrink: 0 }}
+                  onChange={e => set("gaugeTextColor", e.target.value)} />
+              </div>
+
+              <div className="pp-row">
+                <span className="pp-label">Align</span>
+                <div className="pp-toggle">
+                  {(["left", "center", "right"] as const).map(a => (
+                    <button key={a}
+                      className={`pp-toggle-btn${(widget.gaugeTextAlign || "center") === a ? " on" : ""}`}
+                      onClick={() => set("gaugeTextAlign", a)}
+                    >{a[0].toUpperCase() + a.slice(1)}</button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pp-row">
+                <span className="pp-label">Format</span>
+                <div className="txt-fmt-group">
+                  <button className={`txt-fmt-btn${widget.gaugeTextBold ? " on" : ""}`}
+                    title="Bold" onClick={() => set("gaugeTextBold", !widget.gaugeTextBold)}>
+                    <b>B</b>
+                  </button>
+                  <button className={`txt-fmt-btn${widget.gaugeTextItalic ? " on" : ""}`}
+                    title="Italic" onClick={() => set("gaugeTextItalic", !widget.gaugeTextItalic)}>
+                    <i>I</i>
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </>
+      )}
+
       {/* ── Conditional color rules ── */}
       {(widget.type === "bar" || widget.type === "stacked-bar") && (
         <>
