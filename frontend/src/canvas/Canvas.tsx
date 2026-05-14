@@ -4,12 +4,14 @@ import CanvasWidget from "./CanvasWidget"
 import CanvasGrid from "./CanvasGrid"
 import SmartGuides from "./SmartGuides"
 import { useCanvasDrop } from "../hooks/useCanvasDrop"
+import { DEFAULT_THEME } from "../theme/themePresets"
 
 export default function Canvas(){
 
  const widgets    = useDashboardStore((s) => s.dashboard.widgets)
  const canvas     = useDashboardStore((s) => s.dashboard.canvas)
  const background = useDashboardStore((s) => s.dashboard.background)
+ const theme      = useDashboardStore((s) => s.dashboard.theme)
  const clearSelection = useDashboardStore((s) => s.clearSelection)
  const updateCanvas   = useDashboardStore((s) => s.updateCanvas)
  const zoom       = useDashboardStore((s) => s.zoom)
@@ -22,6 +24,21 @@ export default function Canvas(){
  const future     = useDashboardStore((s) => s.future)
 
  const scrollRef = useRef<HTMLDivElement>(null)
+
+ // Active theme — falls back to DEFAULT_THEME so the canvas always has styling
+ const activeTheme = theme ?? DEFAULT_THEME
+
+ // CSS custom properties injected on the canvas frame so all child widgets inherit them
+ const themeVars: React.CSSProperties = {
+  "--surface":   activeTheme.widgetBg,
+  "--border":    activeTheme.widgetBorder,
+  "--accent":    activeTheme.accentColor,
+  "--text":      activeTheme.textColor,
+  "--text2":     activeTheme.textSecondary,
+  "--text3":     activeTheme.textMuted,
+  "--radius-lg": `${activeTheme.widgetRadius}px`,
+  fontFamily:    activeTheme.fontFamily,
+ } as React.CSSProperties
 
  const dynamicHeight = Math.max(
   canvas.height,
@@ -163,9 +180,14 @@ export default function Canvas(){
      Fit
     </button>
 
+
    </div>
 
-   <div id="canvas-scroll" ref={scrollRef}>
+   <div
+    id="canvas-scroll"
+    ref={scrollRef}
+    style={{ backgroundColor: activeTheme.canvasBg }}
+   >
 
     {/* Wrapper keeps resize handles outside the CSS transform */}
     <div style={{ position: "relative", display: "inline-block" }}>
@@ -177,6 +199,7 @@ export default function Canvas(){
        height: dynamicHeight,
        transform: `scale(${zoom / 100})`,
        transformOrigin: "top left",
+       ...themeVars,
        ...bgStyle
       }}
       onDragOver={(e) => { e.preventDefault(); handleFieldDragOver(e) }}

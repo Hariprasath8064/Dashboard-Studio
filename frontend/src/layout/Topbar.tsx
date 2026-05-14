@@ -83,6 +83,7 @@ export default function Topbar({ view, setView }: Props) {
         widgets:    dashboard.widgets,
         canvas:     dashboard.canvas,
         background: dashboard.background,
+        theme:      dashboard.theme,
       }
       const payload = {
         name:       dashboard.name,

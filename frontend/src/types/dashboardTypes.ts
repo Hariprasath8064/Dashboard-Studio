@@ -1,6 +1,7 @@
 import type { Dataset } from "./datasetTypes"
 import type { Widget } from "./widgetTypes"
 import type { BigfixQueryConfig } from "./bigfixTypes"
+import type { ThemeConfig } from "../theme/themePresets"
 
 export interface CanvasConfig {
   width: number
@@ -31,6 +32,9 @@ export interface Dashboard {
 
   /** The global BigFix query configuration — persisted so the query can be re-run */
   bigfixQueryConfig?: BigfixQueryConfig
+
+  /** Active theme — controls colours, palette, font and border-radius across the canvas */
+  theme?: ThemeConfig
 
 }
 

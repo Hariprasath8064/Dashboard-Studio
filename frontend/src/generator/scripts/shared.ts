@@ -6,13 +6,29 @@ import type { ColorRule } from "../../types/widgetTypes"
 export const DEFAULT_COLOR = "#2b7cff"
 export const TRACK_COLOR   = "#e2e8f0"
 
+/**
+ * Module-level palette override used during HTML export.
+ * HTMLGenerator calls setGeneratorPalette() with the active theme's palette
+ * before invoking the script builders, ensuring the exported HTML uses
+ * the same colours the user sees in the builder.
+ */
+let _generatorPalette: string[] = chartColors
+
+export function setGeneratorPalette(palette: string[]): void {
+  _generatorPalette = palette
+}
+
+export function resetGeneratorPalette(): void {
+  _generatorPalette = chartColors
+}
+
 export function resolveColors(widget: any, count: number): string[] {
   if (Array.isArray(widget.barColors) && widget.barColors.length > 0) {
     const base = widget.barColors
     return Array.from({ length: count }, (_, i) => base[i] || base[base.length - 1] || DEFAULT_COLOR)
   }
   if (widget.color) return Array(count).fill(widget.color)
-  return Array.from({ length: count }, (_, i) => chartColors[i % chartColors.length])
+  return Array.from({ length: count }, (_, i) => _generatorPalette[i % _generatorPalette.length])
 }
 
 export function resolveConditionalColors(widget: any, values: number[]): string[] {
@@ -23,7 +39,7 @@ export function resolveConditionalColors(widget: any, values: number[]): string[
       if (matchRule(v, rule)) return rule.color
     }
     if (widget.color) return widget.color
-    return chartColors[i % chartColors.length]
+    return _generatorPalette[i % _generatorPalette.length]
   })
 }
 

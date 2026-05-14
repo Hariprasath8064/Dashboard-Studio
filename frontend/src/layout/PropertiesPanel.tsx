@@ -9,6 +9,7 @@ import KPIProperties   from "../properties/KPIProperties"
 import StylePanel  from "../properties/panels/StylePanel"
 import LayoutPanel from "../properties/panels/LayoutPanel"
 import DatasetFields from "../sidebar/DatasetFields"
+import ThemePanel from "../theme/ThemePanel"
 import { executeStructuredQuery, bigfixRawToDataset } from "../services/bigfixApi"
 import type { BigfixQueryConfig } from "../types/bigfixTypes"
 import { EMPTY_BIGFIX_QUERY } from "../types/bigfixTypes"
@@ -34,87 +35,6 @@ const TYPE_LABELS: Record<string, string> = {
  kpi: "KPI Card",
  table: "Table",
  text: "Text"
-}
-
-const BG_PRESETS = ["#ffffff","#f4f6f9","#f0f4ff","#f0fff4","#fff7f0","#fdf4ff","#1b2230","#0f172a"]
-
-function CanvasProperties() {
-
- const canvas      = useDashboardStore(s => s.dashboard.canvas)
- const background  = useDashboardStore(s => s.dashboard.background)
- const updateCanvas = useDashboardStore(s => s.updateCanvas)
- const setCanvasBg  = useDashboardStore(s => s.setCanvasBg)
-
- const bgColor = background?.color || "#f4f6f9"
-
- return (
-  <div className="pp-scroll">
-
-   <div className="pp-group">
-    <div className="pp-group-label">Dimensions</div>
-
-    <div className="pp-row">
-     <span className="pp-label">Width</span>
-     <input
-      className="pp-input"
-      type="number"
-      min={400} max={3000} step={10}
-      value={canvas.width}
-      onChange={e => updateCanvas({ width: Math.max(400, Number(e.target.value)) })}
-     />
-    </div>
-
-    <div className="pp-row">
-     <span className="pp-label">Height</span>
-     <input
-      className="pp-input"
-      type="number"
-      min={300} max={3000} step={10}
-      value={canvas.height}
-      onChange={e => updateCanvas({ height: Math.max(300, Number(e.target.value)) })}
-     />
-    </div>
-   </div>
-
-   <div className="pp-group">
-    <div className="pp-group-label">Background</div>
-
-    <div className="pp-row">
-     <span className="pp-label">Color</span>
-     <div style={{ display:"flex", alignItems:"center", gap:6, flex:1 }}>
-      <div className="canvas-bg-swatch" style={{ background: bgColor }}>
-       <input
-        type="color"
-        value={bgColor}
-        onChange={e => setCanvasBg({ color: e.target.value, image: "" })}
-       />
-      </div>
-      <input
-       className="pp-input"
-       value={bgColor}
-       onChange={e => setCanvasBg({ color: e.target.value })}
-       style={{ flex:1, fontFamily:"var(--mono)", fontSize:11 }}
-       maxLength={7}
-      />
-     </div>
-    </div>
-
-    <div style={{ display:"flex", flexWrap:"wrap", gap:5, padding:"4px 0 8px 0" }}>
-     {BG_PRESETS.map(c => (
-      <div
-       key={c}
-       className={`pp-swatch${bgColor === c ? " sel" : ""}`}
-       style={{ background: c, border: c === "#ffffff" ? "1px solid var(--border)" : undefined }}
-       title={c}
-       onClick={() => setCanvasBg({ color: c, image: "" })}
-      />
-     ))}
-    </div>
-
-   </div>
-
-  </div>
- )
 }
 
 // ── BigFix query builder shown in Fields panel ──────────────
@@ -492,12 +412,15 @@ export default function PropertiesPanel(){
 
  const widget = widgets.find(w => w.id === selectedId)
 
- const [tab, setTab]   = useState("data")
- const [view, setView] = useState<"properties"|"fields">("fields")
+ // "fields" | "theme" — "theme" tab is context-sensitive:
+ //   widget selected  → shows widget Properties (Data / Style / Layout)
+ //   nothing selected → shows the global Theme & Layout panel
+ const [tab, setTab]       = useState<"fields" | "theme">("fields")
+ const [widgetTab, setWidgetTab] = useState("data")
 
- // Auto-switch: show Properties when a widget is selected, Fields when deselected
+ // Auto-switch to the context tab whenever a widget is selected
  useEffect(() => {
-  setView(selectedId ? "properties" : "fields")
+  if (selectedId) setTab("theme")
  }, [selectedId])
 
  const isTextWidget  = (w: Widget): w is TextWidget  => w.type === "text"
@@ -509,55 +432,55 @@ export default function PropertiesPanel(){
   w.type === "radar" ||
   w.type === "pie" || w.type === "gauge" || w.type === "timeline"
 
- function renderDataPanel(widget: Widget){
-  if(isTextWidget(widget))  return <TextProperties  widget={widget} />
-  if(isTableWidget(widget)) return <TableProperties widget={widget} />
-  if(isKPIWidget(widget))   return <KPIProperties   widget={widget} />
-  if(isChartWidget(widget)) return <ChartProperties widget={widget} />
+ function renderDataPanel(w: Widget){
+  if(isTextWidget(w))  return <TextProperties  widget={w} />
+  if(isTableWidget(w)) return <TableProperties widget={w} />
+  if(isKPIWidget(w))   return <KPIProperties   widget={w} />
+  if(isChartWidget(w)) return <ChartProperties widget={w} />
   return null
  }
+
+ // Second tab label is dynamic so users always know what they're looking at
+ const secondTabLabel = widget ? "Properties" : "Theme"
 
  return(
   <div id="props-panel">
 
-   {/* Top-level view switcher */}
+   {/* ── Top-level tab switcher ── */}
    <div className="rp-view-tabs">
-    <button className={view==="fields"     ? "active" : ""} onClick={()=>setView("fields")}>Fields</button>
-    <button className={view==="properties" ? "active" : ""} onClick={()=>setView("properties")}>Properties</button>
+    <button className={tab === "fields" ? "active" : ""} onClick={() => setTab("fields")}>Fields</button>
+    <button className={tab === "theme"  ? "active" : ""} onClick={() => setTab("theme")}>{secondTabLabel}</button>
    </div>
 
-   {/* ── Fields view ── */}
-   {view==="fields" && <FieldsContent />}
+   {/* ── Fields tab ── */}
+   {tab === "fields" && <FieldsContent />}
 
-   {/* ── Properties view ── */}
-   {view==="properties" && (
-    <>
-     {!widget ? (
-      <>
-       <div className="pp-header">Canvas</div>
-       <CanvasProperties />
-      </>
-     ) : (
-      <>
-       <div className="pp-header">
-        Properties
-        <span className="pp-badge">{TYPE_LABELS[widget.type] || widget.type}</span>
-       </div>
+   {/* ── Theme / Properties tab (context-sensitive) ── */}
+   {tab === "theme" && (
+    widget ? (
+     /* Widget selected → show widget-specific properties */
+     <>
+      <div className="pp-header">
+       Properties
+       <span className="pp-badge">{TYPE_LABELS[widget.type] || widget.type}</span>
+      </div>
 
-       <div className="props-tabs">
-        <button className={tab==="data"   ? "active":""} onClick={()=>setTab("data")}>Data</button>
-        <button className={tab==="style"  ? "active":""} onClick={()=>setTab("style")}>Style</button>
-        <button className={tab==="layout" ? "active":""} onClick={()=>setTab("layout")}>Layout</button>
-       </div>
+      <div className="props-tabs">
+       <button className={widgetTab === "data"   ? "active" : ""} onClick={() => setWidgetTab("data")}>Data</button>
+       <button className={widgetTab === "style"  ? "active" : ""} onClick={() => setWidgetTab("style")}>Style</button>
+       <button className={widgetTab === "layout" ? "active" : ""} onClick={() => setWidgetTab("layout")}>Layout</button>
+      </div>
 
-       <div className="pp-scroll">
-        {tab==="data"   && renderDataPanel(widget)}
-        {tab==="style"  && <StylePanel  widget={widget} />}
-        {tab==="layout" && <LayoutPanel widget={widget} />}
-       </div>
-      </>
-     )}
-    </>
+      <div className="pp-scroll">
+       {widgetTab === "data"   && renderDataPanel(widget)}
+       {widgetTab === "style"  && <StylePanel  widget={widget} />}
+       {widgetTab === "layout" && <LayoutPanel widget={widget} />}
+      </div>
+     </>
+    ) : (
+     /* Nothing selected → show global Theme & Layout panel */
+     <ThemePanel />
+    )
    )}
 
   </div>

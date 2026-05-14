@@ -1,7 +1,17 @@
 import type { ChartWidget, ColorRule } from "../types/widgetTypes"
 import { chartColors } from "../constants/chartColors"
+import { useDashboardStore } from "../store/dashboardStore"
 
 const DEFAULT_COLOR = "#2b7cff"
+
+/**
+ * Returns the chart palette from the active theme.
+ * Called at render time (inside useEffect / event handlers), so it reads the
+ * latest store state synchronously without needing a React hook.
+ */
+function getActivePalette(): string[] {
+  return useDashboardStore.getState().dashboard.theme?.chartPalette ?? chartColors
+}
 
 /** Apply filterTopN — keep the top N values by magnitude */
 export function applyFilter(
@@ -21,6 +31,7 @@ export function applyFilter(
 /** Resolve per-bar colors — applying colorRules conditionally if set */
 export function resolveConditionalColors(widget: ChartWidget, values: number[]): string[] {
   const rules: ColorRule[] = widget.colorRules || []
+  const palette = getActivePalette()
 
   return values.map((v, i) => {
     // Per-bar explicit color takes highest priority
@@ -33,8 +44,8 @@ export function resolveConditionalColors(widget: ChartWidget, values: number[]):
     }
     // Single widget color
     if (widget.color) return widget.color
-    // Palette fallback
-    return chartColors[i % chartColors.length]
+    // Active theme palette fallback
+    return palette[i % palette.length]
   })
 }
 
@@ -56,7 +67,8 @@ export function resolveColors(widget: ChartWidget, count: number): string[] {
     return Array.from({ length: count }, (_, i) => base[i] || base[base.length - 1] || DEFAULT_COLOR)
   }
   if (widget.color) return Array(count).fill(widget.color)
-  return Array.from({ length: count }, (_, i) => chartColors[i % chartColors.length])
+  const palette = getActivePalette()
+  return Array.from({ length: count }, (_, i) => palette[i % palette.length])
 }
 
 /**

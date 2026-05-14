@@ -3,6 +3,7 @@ import type { DashboardState, CanvasBackground } from "../types/dashboardTypes"
 import type { Widget } from "../types/widgetTypes"
 import type { Dataset } from "../types/datasetTypes"
 import type { BigfixSchema, BigfixQueryConfig } from "../types/bigfixTypes"
+import type { ThemeConfig } from "../theme/themePresets"
 import { createWidgetSlice }    from "./slices/widgetSlice"
 import { createSelectionSlice } from "./slices/selectionSlice"
 import { createClipboardSlice } from "./slices/clipboardSlice"
@@ -65,6 +66,10 @@ interface DashboardStore extends DashboardState {
   setBigfixSchema: (schema: BigfixSchema) => void
   setBigfixQueryConfig: (config: BigfixQueryConfig) => void
 
+  // ── Theme ──
+  /** Apply a theme — updates dashboard.theme and syncs canvas background */
+  setTheme: (theme: ThemeConfig) => void
+
 }
 
 export const useDashboardStore = create<DashboardStore>((set, get) => ({
@@ -109,6 +114,16 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
   setBigfixQueryConfig: (config: BigfixQueryConfig) =>
     set((state: any) => ({
       dashboard: { ...state.dashboard, bigfixQueryConfig: config },
+    })),
+
+  // Sets the active theme and syncs the canvas background to the theme's dashboardBg
+  setTheme: (theme: ThemeConfig) =>
+    set((state: any) => ({
+      dashboard: {
+        ...state.dashboard,
+        theme,
+        background: { ...state.dashboard.background, color: theme.dashboardBg },
+      },
     })),
 
 }))
