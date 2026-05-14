@@ -1,5 +1,6 @@
 import type { Dataset } from "./datasetTypes"
 import type { Widget } from "./widgetTypes"
+import type { BigfixQueryConfig } from "./bigfixTypes"
 
 export interface CanvasConfig {
   width: number
@@ -24,6 +25,12 @@ export interface Dashboard {
   widgets: Widget[]
 
   background?: CanvasBackground
+
+  /** When true, data comes from BigFix; when false, from Excel/CSV */
+  bigfixMode?: boolean
+
+  /** The global BigFix query configuration — persisted so the query can be re-run */
+  bigfixQueryConfig?: BigfixQueryConfig
 
 }
 

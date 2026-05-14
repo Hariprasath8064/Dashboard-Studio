@@ -32,11 +32,11 @@ export function renderWidgetHTML(widget: any, columns: any[], rows: any[]): stri
    `
 
     case "kpi": {
-      const kpiValue  = buildKpiValue(widget, columns, rows)
-      const kpiColor  = widget?.color ? `color:${widget.color};` : ""
+      const kpiValue    = buildKpiValue(widget, columns, rows)
+      const kpiColor    = widget?.color ? `color:${widget.color};` : ""
       const kpiFontSize = widget?.fontSize ? `font-size:${widget.fontSize}px;` : ""
-      const prefix    = escapeHtml(widget?.prefix || "")
-      const suffix    = escapeHtml(widget?.suffix || "")
+      const prefix      = escapeHtml(widget?.prefix || "")
+      const suffix      = escapeHtml(widget?.suffix || "")
       return `
    <div class="widget" style="${frameStyle}">
     <div class="widget-inner">
@@ -84,14 +84,16 @@ export function renderWidgetHTML(widget: any, columns: any[], rows: any[]): stri
    `
     }
 
-    case "table":
+    case "table": {
+      const tableHtml = buildTable(widget, columns, rows)
       return `
    <div class="widget" style="${frameStyle}">
     <div class="widget-inner">
-     ${buildTable(widget, columns, rows)}
+     ${tableHtml}
     </div>
    </div>
    `
+    }
 
     default:
       return ""

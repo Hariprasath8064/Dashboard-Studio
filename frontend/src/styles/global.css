@@ -4,6 +4,7 @@
   --font:      'Inter', sans-serif;
   --mono:      'Courier New', monospace;
   --bg:        #f4f5f7;
+  --bg2:       #f8fafc;
   --surface:   #ffffff;
   --surface2:  #f8fafc;
   --border:    #e2e8f0;
@@ -52,3 +53,8 @@ input, select, textarea { font-family: var(--font); font-size: 12px; outline: no
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; opacity: .5; }
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}

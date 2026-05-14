@@ -9,7 +9,7 @@ interface Props {
 
 export default function KPIProperties({ widget }: Props) {
 
-  const dataset = useDashboardStore((s) => s.dashboard.dataset)
+  const dataset      = useDashboardStore((s) => s.dashboard.dataset)
   const updateWidget = useDashboardStore((s) => s.updateWidget)
 
   if (!dataset) return (

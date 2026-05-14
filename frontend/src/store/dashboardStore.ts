@@ -2,6 +2,7 @@ import { create } from "zustand"
 import type { DashboardState, CanvasBackground } from "../types/dashboardTypes"
 import type { Widget } from "../types/widgetTypes"
 import type { Dataset } from "../types/datasetTypes"
+import type { BigfixSchema, BigfixQueryConfig } from "../types/bigfixTypes"
 import { createWidgetSlice }    from "./slices/widgetSlice"
 import { createSelectionSlice } from "./slices/selectionSlice"
 import { createClipboardSlice } from "./slices/clipboardSlice"
@@ -57,6 +58,13 @@ interface DashboardStore extends DashboardState {
   setSavedDashboardId: (id: string | null) => void
   setSavedDatasetId:   (id: string | null) => void
 
+  // ── BigFix ──
+  /** Inspector schema loaded from backend — ephemeral, not saved to DB */
+  bigfixSchema: BigfixSchema | null
+  setBigfixMode: (mode: boolean) => void
+  setBigfixSchema: (schema: BigfixSchema) => void
+  setBigfixQueryConfig: (config: BigfixQueryConfig) => void
+
 }
 
 export const useDashboardStore = create<DashboardStore>((set, get) => ({
@@ -69,6 +77,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
     dataset: null,
     widgets: [],
     background: { color: "#f4f6f9" },
+    bigfixMode: false,
   },
   selectedWidgetId:  null,
   selectedWidgetIds: [],
@@ -79,6 +88,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
   future:            [],
   guideLines:        { vertical: [], horizontal: [] },
   datasetName:       null,
+  bigfixSchema:      null,
 
   // ── slices ──
   ...createWidgetSlice(set),
@@ -86,5 +96,19 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
   ...createClipboardSlice(set, get),
   ...createHistorySlice(set),
   ...createCanvasSlice(set),
+
+  // ── BigFix actions ──
+  setBigfixMode: (mode: boolean) =>
+    set((state: any) => ({
+      dashboard: { ...state.dashboard, bigfixMode: mode },
+    })),
+
+  setBigfixSchema: (schema: BigfixSchema) =>
+    set(() => ({ bigfixSchema: schema })),
+
+  setBigfixQueryConfig: (config: BigfixQueryConfig) =>
+    set((state: any) => ({
+      dashboard: { ...state.dashboard, bigfixQueryConfig: config },
+    })),
 
 }))

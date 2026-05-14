@@ -52,8 +52,8 @@ interface Props { widget: TableType }
 
 export default function TableWidget({ widget }: Props) {
 
-  const dataset = useDashboardStore(s => s.dashboard.dataset)
-  const theme = widget.theme || "default"
+  const dataset      = useDashboardStore(s => s.dashboard.dataset)
+  const theme        = widget.theme || "default"
   const computedCols = widget.computedColumns || []
 
   if (!dataset) {

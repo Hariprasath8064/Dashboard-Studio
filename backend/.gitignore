@@ -7,14 +7,12 @@
 *.db-shm
 *.db-wal
 
-# Compiled binary
-*.exe
-dashboard-builder
-dashboard-builder.exe
+# Node.js
+node_modules/
+npm-debug.log*
 
-# Go build cache / test artifacts
-*.test
-*.out
+# Logs
+logs/*.log
 
 # OS
 .DS_Store
