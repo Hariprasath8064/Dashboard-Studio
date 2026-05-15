@@ -94,12 +94,10 @@ export default function DatasetPanel() {
   return (
     <div style={{ marginTop: 16 }}>
 
-      {/* ── Source selector: two mutually exclusive checkboxes ── */}
       <div className="section-label" style={{ marginBottom: 8 }}>Data Source</div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 14 }}>
 
-        {/* Excel / CSV option */}
         <label
           className={`ds-source-option${!bigfixMode ? " active" : ""}`}
           onClick={() => setBigfixMode(false)}
@@ -119,7 +117,6 @@ export default function DatasetPanel() {
           <span style={{ fontSize: 12, fontWeight: 500 }}>Excel / CSV</span>
         </label>
 
-        {/* BigFix option */}
         <label
           className={`ds-source-option${bigfixMode ? " active" : ""}`}
           onClick={() => setBigfixMode(true)}
@@ -140,7 +137,6 @@ export default function DatasetPanel() {
 
       </div>
 
-      {/* ── BigFix: connection status ── */}
       {bigfixMode && (
         <div className="ds-bigfix-status">
           {schemaLoading && (
@@ -200,7 +196,6 @@ export default function DatasetPanel() {
         </div>
       )}
 
-      {/* ── Excel / CSV: file upload ── */}
       {!bigfixMode && (
         <>
           <div className="section-label">Dataset</div>

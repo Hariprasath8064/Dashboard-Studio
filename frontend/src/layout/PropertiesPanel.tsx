@@ -5,6 +5,7 @@ import ChartProperties from "../properties/ChartProperties"
 import TextProperties  from "../properties/TextProperties"
 import TableProperties from "../properties/TableProperties"
 import KPIProperties   from "../properties/KPIProperties"
+import ImageProperties from "../properties/ImageProperties"
 
 import StylePanel  from "../properties/panels/StylePanel"
 import LayoutPanel from "../properties/panels/LayoutPanel"
@@ -18,7 +19,8 @@ import type {
  TextWidget,
  TableWidget,
  KPIWidget,
- ChartWidget
+ ChartWidget,
+ ImageWidget,
 } from "../types/widgetTypes"
 
 const TYPE_LABELS: Record<string, string> = {
@@ -34,14 +36,12 @@ const TYPE_LABELS: Record<string, string> = {
  timeline: "Timeline",
  kpi: "KPI Card",
  table: "Table",
- text: "Text"
+ text: "Text",
+ image: "Image",
 }
-
-// ── BigFix query builder shown in Fields panel ──────────────
 
 function BigfixQueryBuilder() {
 
- // ── ALL hooks must be called unconditionally, before any early returns ──
  const bigfixSchema         = useDashboardStore(s => s.bigfixSchema)
  const savedConfig          = useDashboardStore(s => s.dashboard.bigfixQueryConfig)
  const setBigfixQueryConfig = useDashboardStore(s => s.setBigfixQueryConfig)
@@ -54,12 +54,10 @@ function BigfixQueryBuilder() {
  const [fetchError, setFetchError] = useState<string | null>(null)
  const [search, setSearch]         = useState("")
 
- // Keep local state in sync when saved config changes externally
  useEffect(() => {
   if (savedConfig) setCfg(savedConfig)
  }, [savedConfig])
 
- // Stats derived from the current dataset (must be before any early return)
  const stats = useMemo(() => {
   if (!dataset) return null
   const dims    = dataset.columns.filter(c => c.type !== "number").length
@@ -67,7 +65,6 @@ function BigfixQueryBuilder() {
   return { total: dataset.columns.length, rows: dataset.rows.length, dims, metrics }
  }, [dataset])
 
- // ── Early return AFTER all hooks ──
  if (!bigfixSchema) {
   return (
    <div className="fp-empty" style={{ padding: "16px 14px" }}>
@@ -133,7 +130,6 @@ function BigfixQueryBuilder() {
   <div className="pp-scroll">
    <div style={{ padding: "10px 14px 0" }}>
 
-    {/* Object Type */}
     <div className="bf-query-section">
      <div className="bf-query-label">Object Type</div>
      <select
@@ -148,7 +144,6 @@ function BigfixQueryBuilder() {
      </select>
     </div>
 
-    {/* Dimension (Group By) */}
     {cfg.objectType && (
      <div className="bf-query-section">
       <div className="bf-query-label">
@@ -168,7 +163,6 @@ function BigfixQueryBuilder() {
      </div>
     )}
 
-    {/* Metric (optional) */}
     {cfg.objectType && cfg.dimension && (
      <div className="bf-query-section">
       <div className="bf-query-label">
@@ -189,7 +183,6 @@ function BigfixQueryBuilder() {
      </div>
     )}
 
-    {/* Additional Properties */}
     {cfg.objectType && cfg.dimension && (
      <div className="bf-query-section">
       <div className="bf-query-label">
@@ -218,7 +211,6 @@ function BigfixQueryBuilder() {
      </div>
     )}
 
-    {/* Sites filter */}
     {cfg.objectType && cfg.dimension && bigfixSchema && (
      <div className="bf-query-section">
       <div className="bf-query-label">
@@ -246,12 +238,10 @@ function BigfixQueryBuilder() {
      </div>
     )}
 
-    {/* Error */}
     {fetchError && (
      <div className="bf-fetch-error">{fetchError}</div>
     )}
 
-    {/* Fetch button */}
     <button
      className={`bf-fetch-btn${canFetch ? "" : " disabled"}`}
      onClick={fetchData}
@@ -276,7 +266,6 @@ function BigfixQueryBuilder() {
 
    </div>
 
-   {/* Fields list — shown once data is fetched */}
    {dataset && stats && (
     <>
      <div style={{ padding: "10px 14px 0", borderTop: "1px solid var(--border)", marginTop: 10 }}>
@@ -321,8 +310,6 @@ function BigfixQueryBuilder() {
   </div>
  )
 }
-
-// ── Excel/CSV fields view ────────────────────────────────
 
 function ExcelFieldsContent() {
 
@@ -412,13 +399,9 @@ export default function PropertiesPanel(){
 
  const widget = widgets.find(w => w.id === selectedId)
 
- // "fields" | "theme" — "theme" tab is context-sensitive:
- //   widget selected  → shows widget Properties (Data / Style / Layout)
- //   nothing selected → shows the global Theme & Layout panel
  const [tab, setTab]       = useState<"fields" | "theme">("fields")
  const [widgetTab, setWidgetTab] = useState("data")
 
- // Auto-switch to the context tab whenever a widget is selected
  useEffect(() => {
   if (selectedId) setTab("theme")
  }, [selectedId])
@@ -426,6 +409,7 @@ export default function PropertiesPanel(){
  const isTextWidget  = (w: Widget): w is TextWidget  => w.type === "text"
  const isTableWidget = (w: Widget): w is TableWidget => w.type === "table"
  const isKPIWidget   = (w: Widget): w is KPIWidget   => w.type === "kpi"
+ const isImageWidget = (w: Widget): w is ImageWidget => w.type === "image"
  const isChartWidget = (w: Widget): w is ChartWidget =>
   w.type === "bar" || w.type === "line" || w.type === "donut" ||
   w.type === "area" || w.type === "stacked-bar" || w.type === "scatter" ||
@@ -436,29 +420,25 @@ export default function PropertiesPanel(){
   if(isTextWidget(w))  return <TextProperties  widget={w} />
   if(isTableWidget(w)) return <TableProperties widget={w} />
   if(isKPIWidget(w))   return <KPIProperties   widget={w} />
+  if(isImageWidget(w)) return <ImageProperties widget={w} />
   if(isChartWidget(w)) return <ChartProperties widget={w} />
   return null
  }
 
- // Second tab label is dynamic so users always know what they're looking at
  const secondTabLabel = widget ? "Properties" : "Theme"
 
  return(
   <div id="props-panel">
 
-   {/* ── Top-level tab switcher ── */}
    <div className="rp-view-tabs">
     <button className={tab === "fields" ? "active" : ""} onClick={() => setTab("fields")}>Fields</button>
     <button className={tab === "theme"  ? "active" : ""} onClick={() => setTab("theme")}>{secondTabLabel}</button>
    </div>
 
-   {/* ── Fields tab ── */}
    {tab === "fields" && <FieldsContent />}
 
-   {/* ── Theme / Properties tab (context-sensitive) ── */}
    {tab === "theme" && (
     widget ? (
-     /* Widget selected → show widget-specific properties */
      <>
       <div className="pp-header">
        Properties
@@ -478,7 +458,6 @@ export default function PropertiesPanel(){
       </div>
      </>
     ) : (
-     /* Nothing selected → show global Theme & Layout panel */
      <ThemePanel />
     )
    )}

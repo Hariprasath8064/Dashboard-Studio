@@ -14,6 +14,9 @@ export type WidgetType =
   | "kpi"
   | "table"
   | "text"
+  | "image"
+
+export type FitMode = "cover" | "contain" | "fill" | "none"
 
 export interface ColorRule {
   op: "lt" | "gt" | "lte" | "gte" | "eq"
@@ -162,8 +165,24 @@ export interface TextWidget extends WidgetBase {
 
 }
 
+export interface ImageWidget extends WidgetBase {
+
+  sourceType: "url" | "upload"
+
+  src: string
+
+  fit: FitMode
+
+  // 0–100
+  opacity: number
+
+  alt?: string
+
+}
+
 export type Widget =
   | ChartWidget
   | KPIWidget
   | TableWidget
   | TextWidget
+  | ImageWidget

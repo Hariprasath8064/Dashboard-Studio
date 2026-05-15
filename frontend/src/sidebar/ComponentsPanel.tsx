@@ -117,6 +117,13 @@ export default function ComponentsPanel(){
     <rect x="2" y="7" width="9" height="2" rx="1" fill="#005EB8" opacity=".5"/>
     <rect x="2" y="11" width="11" height="2" rx="1" fill="#005EB8" opacity=".35"/>
    </svg>
+  ),
+  image: (
+   <svg viewBox="0 0 16 16" fill="none">
+    <rect x="1" y="2.5" width="14" height="11" rx="1.5" stroke="#005EB8" strokeWidth="1" fill="none"/>
+    <circle cx="5.5" cy="6.5" r="1.5" fill="#005EB8" opacity=".6"/>
+    <path d="M1 11.5l3.5-4 3 3 2.5-2.5 5 4" stroke="#005EB8" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+   </svg>
   )
  }
 
@@ -145,6 +152,7 @@ export default function ComponentsPanel(){
     {card("kpi","KPI Card",icons.kpi)}
     {card("table","Table",icons.table)}
     {card("text","Text",icons.text)}
+    {card("image","Image",icons.image)}
    </div>
 
   </div>

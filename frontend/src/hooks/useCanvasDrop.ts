@@ -71,7 +71,6 @@ export function useCanvasDrop(zoom: number) {
     const x       = (e.clientX - rect.left) / (zoom / 100)
     const y       = (e.clientY - rect.top)  / (zoom / 100)
 
-    // ── Field drag from sidebar ──
     const colName = e.dataTransfer.getData("dataset-column")
     const colType = e.dataTransfer.getData("dataset-column-type")
     if (colName) {
@@ -79,7 +78,6 @@ export function useCanvasDrop(zoom: number) {
       return
     }
 
-    // ── Component drag from sidebar ──
     const type = e.dataTransfer.getData("component-type")
     if (!type) return
     const base = {
@@ -92,6 +90,7 @@ export function useCanvasDrop(zoom: number) {
     if (type === "text")  { addWidget({ ...base, heading: "Text Widget", body: "Edit this text" } as any); return }
     if (type === "kpi")   { addWidget({ ...base, label: "KPI", valueColumn: "", aggregation: "SUM" } as any); return }
     if (type === "table") { addWidget({ ...base, columns: [] } as any); return }
+    if (type === "image") { addWidget({ ...base, size: { width: 320, height: 220 }, sourceType: "url", src: "", fit: "cover", opacity: 100, alt: "" } as any); return }
     if (type === "gauge") { addWidget({ ...base, size: { width: 260, height: 200 }, title: "Gauge", query: { xColumn: "", yColumn: "", aggregation: "SUM" } } as any); return }
     if (type === "scatter") { addWidget({ ...base, title: "Scatter", query: { xColumn: "", yColumn: "", aggregation: "SUM" } } as any); return }
     if (type === "radar")   { addWidget({ ...base, title: "Radar",   query: { xColumn: "", yColumn: "", aggregation: "SUM" } } as any); return }

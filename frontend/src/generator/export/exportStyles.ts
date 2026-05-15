@@ -139,4 +139,19 @@ body{
  color:#a3a9b6;
  font-size:14px;
 }
+.img-inner{
+ width:100%;
+ height:100%;
+ overflow:hidden;
+}
+.img-placeholder{
+ width:100%;
+ height:100%;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ background:#f8fafc;
+ color:#94a3b8;
+ font-size:12px;
+}
 `

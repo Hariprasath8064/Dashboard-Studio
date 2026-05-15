@@ -2,29 +2,20 @@ import { useState } from "react"
 import { useDashboardStore } from "../store/dashboardStore"
 import { PRESET_THEMES, DEFAULT_THEME, type ThemeConfig } from "./themePresets"
 
-// ─────────────────────────────────────────────────
-//  SVG Mini-Preview
-//  Draws a scaled-down dashboard preview that shows how the theme looks
-//  with a heading, bar chart widget, KPI card, and donut chart widget.
-// ─────────────────────────────────────────────────
 function ThemePreview({ theme }: { theme: ThemeConfig }) {
   const p = theme.chartPalette
-  const r = Math.min(theme.widgetRadius, 6)  // cap radius so it looks right at preview scale
+  const r = Math.min(theme.widgetRadius, 6)
 
   return (
     <svg viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg" style={{ display: "block" }}>
-      {/* Page / dashboard background */}
       <rect width="200" height="130" fill={theme.dashboardBg} />
 
-      {/* ── Heading text area ── */}
       <rect x="10" y="11" width="72" height="7" rx="2" fill={theme.textColor} opacity="0.88" />
       <rect x="10" y="22" width="104" height="3" rx="1" fill={theme.textSecondary} opacity="0.45" />
       <rect x="10" y="28" width="82"  height="3" rx="1" fill={theme.textSecondary} opacity="0.3" />
 
-      {/* ── Bar chart widget ── */}
       <rect x="8" y="38" width="116" height="84" rx={r} fill={theme.widgetBg} stroke={theme.widgetBorder} strokeWidth="0.8" />
       <rect x="16" y="46" width="50"  height="4" rx="1" fill={theme.textColor} opacity="0.55" />
-      {/* Bars (bottom-aligned to y=113) */}
       <rect x="20" y="86" width="13" height="27" rx="1" fill={p[0]} />
       <rect x="37" y="73" width="13" height="40" rx="1" fill={p[1]} />
       <rect x="54" y="80" width="13" height="33" rx="1" fill={p[2]} />
@@ -32,20 +23,16 @@ function ThemePreview({ theme }: { theme: ThemeConfig }) {
       <rect x="88" y="76" width="13" height="37" rx="1" fill={p[4] || p[1]} />
       <line x1="16" y1="113" x2="108" y2="113" stroke={theme.widgetBorder} strokeWidth="0.8" />
 
-      {/* ── KPI card widget ── */}
       <rect x="130" y="38" width="62" height="38" rx={r} fill={theme.widgetBg} stroke={theme.widgetBorder} strokeWidth="0.8" />
       <rect x="138" y="46" width="30" height="3"  rx="1" fill={theme.textSecondary} opacity="0.5" />
       <rect x="138" y="53" width="28" height="11" rx="2" fill={theme.accentColor}   opacity="0.85" />
       <rect x="138" y="67" width="18" height="3"  rx="1" fill={theme.textMuted}     opacity="0.4" />
 
-      {/* ── Donut chart widget ── */}
       <rect x="130" y="84" width="62" height="38" rx={r} fill={theme.widgetBg} stroke={theme.widgetBorder} strokeWidth="0.8" />
-      {/* Donut segments (center 150,103) */}
       <circle cx="150" cy="103" r="12" fill="none" stroke={p[0]} strokeWidth="7" strokeDasharray="26 50" />
       <circle cx="150" cy="103" r="12" fill="none" stroke={p[1]} strokeWidth="7" strokeDasharray="18 58" strokeDashoffset="-26" />
       <circle cx="150" cy="103" r="12" fill="none" stroke={p[2]} strokeWidth="7" strokeDasharray="9 65"  strokeDashoffset="-44" />
       <circle cx="150" cy="103" r="4" fill={theme.widgetBg} />
-      {/* Donut legend */}
       <rect x="167" y="95"  width="4" height="4" rx="1" fill={p[0]} />
       <rect x="173" y="96"  width="14" height="2" rx="1" fill={theme.textSecondary} opacity="0.4" />
       <rect x="167" y="103" width="4" height="4" rx="1" fill={p[1]} />
@@ -54,9 +41,6 @@ function ThemePreview({ theme }: { theme: ThemeConfig }) {
   )
 }
 
-// ─────────────────────────────────────────────────
-//  Font options
-// ─────────────────────────────────────────────────
 const FONT_OPTIONS = [
   { label: "Inter",        value: "Inter, Arial, sans-serif"           },
   { label: "Roboto",       value: "Roboto, Arial, sans-serif"          },
@@ -65,9 +49,6 @@ const FONT_OPTIONS = [
   { label: "System UI",    value: "system-ui, -apple-system, sans-serif" },
 ]
 
-// ─────────────────────────────────────────────────
-//  Canvas quick-size presets
-// ─────────────────────────────────────────────────
 const SIZE_PRESETS = [
   { label: "HD  (1280 × 720)",       w: 1280, h: 720  },
   { label: "Full HD  (1920 × 1080)", w: 1920, h: 1080 },
@@ -75,9 +56,6 @@ const SIZE_PRESETS = [
   { label: "Square  (1000 × 1000)",  w: 1000, h: 1000 },
 ]
 
-// ─────────────────────────────────────────────────
-//  ThemePanel — rendered inline in the right sidebar
-// ─────────────────────────────────────────────────
 export default function ThemePanel() {
 
   const dashboard    = useDashboardStore(s => s.dashboard)
@@ -89,20 +67,17 @@ export default function ThemePanel() {
 
   const [subTab, setSubTab] = useState<"theme" | "layout">("theme")
 
-  // Local state for the custom theme editor, pre-filled from the current theme
   const [custom, setCustom] = useState<ThemeConfig>({
     ...currentTheme,
     id:   "custom",
     name: "Custom",
   })
 
-  // Apply a preset: push to store and sync the custom editor
   function applyPreset(t: ThemeConfig) {
     setTheme(t)
     setCustom({ ...t, id: "custom", name: "Custom" })
   }
 
-  // Patch the custom theme and apply immediately
   function updateCustom(patch: Partial<ThemeConfig>) {
     const updated: ThemeConfig = { ...custom, ...patch, id: "custom", name: "Custom" }
     setCustom(updated)
@@ -121,7 +96,6 @@ export default function ThemePanel() {
   return (
     <div className="tp-panel">
 
-      {/* ── Sub-tabs: Theme | Layout ── */}
       <div className="tp-tabs">
         <button
           className={subTab === "theme"  ? "active" : ""}
@@ -139,7 +113,6 @@ export default function ThemePanel() {
 
       <div className="tp-body">
 
-        {/* ════════ THEME sub-tab ════════ */}
         {subTab === "theme" && (
           <>
             <div className="tp-section-label">Presets</div>
@@ -152,7 +125,6 @@ export default function ThemePanel() {
                   onClick={() => applyPreset(t)}
                   title={t.name}
                 >
-                  {/* SVG mini dashboard preview */}
                   <div className="tp-preview">
                     <ThemePreview theme={t} />
                   </div>
@@ -262,7 +234,6 @@ export default function ThemePanel() {
           </>
         )}
 
-        {/* ════════ LAYOUT sub-tab ════════ */}
         {subTab === "layout" && (
           <>
             <div className="tp-section-label">Canvas Size</div>

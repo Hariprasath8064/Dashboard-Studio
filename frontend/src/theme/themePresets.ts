@@ -1,33 +1,16 @@
-// ─────────────────────────────────────────────────
-//  Theme Presets
-//  Single source of truth for ThemeConfig type and all built-in themes.
-//  Every field maps directly to a CSS custom property applied on the canvas.
-// ─────────────────────────────────────────────────
-
 export interface ThemeConfig {
   id:            string
   name:          string
-  /** Background of the outer scroll / page area */
   canvasBg:      string
-  /** Background of the dashboard card itself */
   dashboardBg:   string
-  /** Widget card background  →  --surface */
   widgetBg:      string
-  /** Widget card border colour  →  --border */
   widgetBorder:  string
-  /** Widget card corner radius in px  →  --radius-lg */
   widgetRadius:  number
-  /** Primary text colour  →  --text */
   textColor:     string
-  /** Secondary / label text colour  →  --text2 */
   textSecondary: string
-  /** Muted / placeholder text colour  →  --text3 */
   textMuted:     string
-  /** Accent colour (KPI values, active borders, buttons)  →  --accent */
   accentColor:   string
-  /** Font family applied to the entire canvas */
   fontFamily:    string
-  /** 6-colour chart palette used by all chart widgets */
   chartPalette:  string[]
 }
 

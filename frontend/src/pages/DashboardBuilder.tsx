@@ -27,7 +27,6 @@ export default function DashboardBuilder(){
 
  const [view, setView] = useState<"design"|"preview"|"code">("design")
 
- // ── Global keyboard shortcuts ──
  useEffect(() => {
   function onKeyDown(e: KeyboardEvent) {
 

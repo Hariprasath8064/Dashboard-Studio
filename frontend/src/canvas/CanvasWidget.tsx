@@ -17,11 +17,12 @@ import RadarChartWidget  from "../widgets/RadarChart/RadarChartWidget"
 import KPIWidget       from "../widgets/KPIWidget/KPIWidget"
 import TableWidget     from "../widgets/TableWidget/TableWidget"
 import TextWidget      from "../widgets/TextWidget/TextWidget"
+import ImageWidget     from "../widgets/ImageWidget/ImageWidget"
 
 const TYPE_ICON: Record<string, string> = {
   bar: "▤", line: "↗", area: "△", "stacked-bar": "▦", scatter: "∷", radar: "☆",
   donut: "◎", pie: "◔", gauge: "◑", timeline: "≡",
-  kpi: "#", table: "⊞", text: "T"
+  kpi: "#", table: "⊞", text: "T", image: "▣"
 }
 
 interface Props {
@@ -84,6 +85,7 @@ export default function CanvasWidget({ widget }: Props) {
       case "kpi":       return <KPIWidget       widget={w as any} />
       case "table":     return <TableWidget     widget={w as any} />
       case "text":      return <TextWidget      widget={w as any} />
+      case "image":     return <ImageWidget     widget={w as any} />
       default:          return null
     }
   }

@@ -70,8 +70,6 @@ export default function Canvas(){
   setZoom(Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Math.min(fitZoomW, fitZoomH))))
  }
 
- // ── Canvas edge resize handlers ──
-
  function startResizeE(e: React.MouseEvent) {
   e.stopPropagation(); e.preventDefault()
   const startX = e.clientX; const origW = canvas.width

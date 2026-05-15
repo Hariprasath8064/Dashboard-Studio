@@ -1,5 +1,3 @@
-// ── Per-widget HTML fragment builders ────────────────────
-
 export function renderWidgetHTML(widget: any, columns: any[], rows: any[]): string {
 
   const left   = widget?.position?.x ?? 0
@@ -95,12 +93,35 @@ export function renderWidgetHTML(widget: any, columns: any[], rows: any[]): stri
    `
     }
 
+    case "image": {
+      const src     = widget?.src     || ""
+      const fit     = widget?.fit     || "cover"
+      const opacity = (widget?.opacity ?? 100) / 100
+      const alt     = escapeHtml(widget?.alt || "")
+      if (!src) {
+        return `
+   <div class="widget" style="${frameStyle}">
+    <div class="widget-inner">
+     <div class="img-placeholder">No image</div>
+    </div>
+   </div>
+   `
+      }
+      return `
+   <div class="widget" style="${frameStyle}">
+    <div class="widget-inner">
+     <div class="img-inner">
+      <img src="${src}" alt="${alt}" style="width:100%;height:100%;object-fit:${fit};opacity:${opacity};display:block;" />
+     </div>
+    </div>
+   </div>
+   `
+    }
+
     default:
       return ""
   }
 }
-
-// ── KPI value computation ─────────────────────────────────
 
 function buildKpiValue(widget: any, columns: any[], rows: any[]): string {
   if (!columns.length || !rows.length) return "--"
@@ -130,8 +151,6 @@ function buildKpiValue(widget: any, columns: any[], rows: any[]): string {
     ? result.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
     : "--"
 }
-
-// ── Table HTML builder ────────────────────────────────────
 
 function computeHtmlCell(row: any[], columns: any[], col: any): string {
   const fmtN = (n: number) => Number.isInteger(n) ? String(n) : parseFloat(n.toFixed(2)).toString()
@@ -202,8 +221,6 @@ function buildTable(widget: any, columns: any[], rows: any[]): string {
  </div>
  `
 }
-
-// ── HTML escaping ────────────────────────────────────────
 
 export function escapeHtml(value: any): string {
   return String(value ?? "")

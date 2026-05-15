@@ -12,38 +12,32 @@ import { createCanvasSlice }    from "./slices/canvasSlice"
 
 interface DashboardStore extends DashboardState {
 
-  // ── widget mutations ──
   addWidget: (widget: Widget) => void
   updateWidget: (widget: Widget) => void
   updateWidgets: (widgets: Widget[]) => void
   deleteWidget: (id: string) => void
   deleteSelected: () => void
 
-  // ── selection ──
   selectedWidgetIds: string[]
   selectWidget: (id: string | null) => void
   addToSelection: (id: string) => void
   setSelection: (ids: string[]) => void
   clearSelection: () => void
 
-  // ── clipboard ──
   clipboard: Widget[]
   copySelected: () => void
   pasteWidgets: () => void
   duplicateSelected: () => void
 
-  // ── history ──
   past: Widget[][]
   future: Widget[][]
   beginDrag: () => void
   undo: () => void
   redo: () => void
 
-  // ── guide lines ──
   guideLines: { vertical: number[]; horizontal: number[] }
   setGuideLines: (lines: { vertical: number[]; horizontal: number[] }) => void
 
-  // ── canvas / settings ──
   datasetName: string | null
   savedDashboardId: string | null
   savedDatasetId:   string | null
@@ -59,22 +53,17 @@ interface DashboardStore extends DashboardState {
   setSavedDashboardId: (id: string | null) => void
   setSavedDatasetId:   (id: string | null) => void
 
-  // ── BigFix ──
-  /** Inspector schema loaded from backend — ephemeral, not saved to DB */
   bigfixSchema: BigfixSchema | null
   setBigfixMode: (mode: boolean) => void
   setBigfixSchema: (schema: BigfixSchema) => void
   setBigfixQueryConfig: (config: BigfixQueryConfig) => void
 
-  // ── Theme ──
-  /** Apply a theme — updates dashboard.theme and syncs canvas background */
   setTheme: (theme: ThemeConfig) => void
 
 }
 
 export const useDashboardStore = create<DashboardStore>((set, get) => ({
 
-  // ── initial state ──
   dashboard: {
     id: "dashboard-1",
     name: "Untitled Dashboard",
@@ -95,14 +84,12 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
   datasetName:       null,
   bigfixSchema:      null,
 
-  // ── slices ──
   ...createWidgetSlice(set),
   ...createSelectionSlice(set),
   ...createClipboardSlice(set, get),
   ...createHistorySlice(set),
   ...createCanvasSlice(set),
 
-  // ── BigFix actions ──
   setBigfixMode: (mode: boolean) =>
     set((state: any) => ({
       dashboard: { ...state.dashboard, bigfixMode: mode },
@@ -116,7 +103,6 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
       dashboard: { ...state.dashboard, bigfixQueryConfig: config },
     })),
 
-  // Sets the active theme and syncs the canvas background to the theme's dashboardBg
   setTheme: (theme: ThemeConfig) =>
     set((state: any) => ({
       dashboard: {
