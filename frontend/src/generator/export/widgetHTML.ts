@@ -30,17 +30,19 @@ export function renderWidgetHTML(widget: any, columns: any[], rows: any[]): stri
    `
 
     case "kpi": {
-      const kpiValue    = buildKpiValue(widget, columns, rows)
       const kpiColor    = widget?.color ? `color:${widget.color};` : ""
-      const kpiFontSize = widget?.fontSize ? `font-size:${widget.fontSize}px;` : ""
+      const kpiFontSize = `font-size:${widget?.fontSize ?? 36}px;`
       const prefix      = escapeHtml(widget?.prefix || "")
       const suffix      = escapeHtml(widget?.suffix || "")
+      const mainVal     = buildKpiValue(widget, columns, rows)
+      const deltaHtml   = buildKpiDelta(widget, columns, rows)
       return `
    <div class="widget" style="${frameStyle}">
     <div class="widget-inner">
      <div class="kpi-inner">
-      <div class="kpi-val" style="${kpiColor}${kpiFontSize}">${prefix}${kpiValue}${suffix}</div>
       <div class="kpi-label-txt">${escapeHtml(widget?.label || "KPI")}</div>
+      <div class="kpi-val" style="${kpiColor}${kpiFontSize}">${prefix}${mainVal}${suffix}</div>
+      ${deltaHtml}
      </div>
     </div>
    </div>
@@ -123,33 +125,76 @@ export function renderWidgetHTML(widget: any, columns: any[], rows: any[]): stri
   }
 }
 
+function kpiAggregate(nums: number[], agg: string): number | null {
+  if (!nums.length) return null
+  switch ((agg || "SUM").toUpperCase()) {
+    case "AVG":   return nums.reduce((a, b) => a + b, 0) / nums.length
+    case "COUNT": return nums.length
+    case "MIN":   return Math.min(...nums)
+    case "MAX":   return Math.max(...nums)
+    default:      return nums.reduce((a, b) => a + b, 0)
+  }
+}
+
+function kpiFormatNum(value: number, fmt: string | undefined, decimals: number): string {
+  const d   = decimals ?? 0
+  const abs = Math.abs(value)
+  const f   = fmt ?? "auto"
+  if (f === "full") return value.toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d })
+  if (f === "b" || (f === "auto" && abs >= 1_000_000_000)) return (value / 1_000_000_000).toFixed(1).replace(/\.0$/, "") + "B"
+  if (f === "m" || (f === "auto" && abs >= 1_000_000))     return (value / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M"
+  if (f === "k" || (f === "auto" && abs >= 10_000))        return (value / 1_000).toFixed(1).replace(/\.0$/, "") + "K"
+  return value.toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d })
+}
+
+function getColNums(columns: any[], rows: any[], colName: string): number[] {
+  const idx = columns.findIndex((c: any) => c?.name === colName)
+  if (idx < 0) return []
+  return rows.map((r: any) => Number(r?.[idx])).filter((n: number) => Number.isFinite(n))
+}
+
 function buildKpiValue(widget: any, columns: any[], rows: any[]): string {
   if (!columns.length || !rows.length) return "--"
+  const nums   = getColNums(columns, rows, widget?.valueColumn)
+  const result = kpiAggregate(nums, widget?.aggregation)
+  if (result === null) return "--"
+  return kpiFormatNum(result, widget?.numberFormat, widget?.decimals ?? 0)
+}
 
-  const idx = columns.findIndex((c) => c?.name === widget?.valueColumn)
-  if (idx < 0) return "--"
+function buildKpiDelta(widget: any, columns: any[], rows: any[]): string {
+  const cmpType = widget?.comparisonType ?? "none"
+  if (cmpType === "none") return ""
+  if (!columns.length || !rows.length) return ""
 
-  const nums = rows
-    .map((row) => Number(row?.[idx] ?? 0))
-    .filter((n) => Number.isFinite(n))
+  const primaryNums = getColNums(columns, rows, widget?.valueColumn)
+  const primaryRaw  = kpiAggregate(primaryNums, widget?.aggregation)
+  if (primaryRaw === null) return ""
 
-  if (!nums.length) return "--"
-
-  const agg = (widget?.aggregation || "SUM").toUpperCase()
-
-  let result: number
-  switch (agg) {
-    case "AVG":   result = nums.reduce((a, b) => a + b, 0) / nums.length; break
-    case "COUNT": result = nums.length; break
-    case "MIN":   result = Math.min(...nums); break
-    case "MAX":   result = Math.max(...nums); break
-    default:      result = nums.reduce((a, b) => a + b, 0)
+  let cmpRaw: number | null = null
+  if (cmpType === "column" && widget?.comparisonColumn) {
+    const cmpNums = getColNums(columns, rows, widget.comparisonColumn)
+    cmpRaw = kpiAggregate(cmpNums, widget?.aggregation)
+  } else if (cmpType === "target" && widget?.comparisonTarget != null) {
+    cmpRaw = Number(widget.comparisonTarget)
   }
+  if (cmpRaw === null || cmpRaw === 0) return ""
 
-  const decimals = widget?.decimals ?? 0
-  return Number.isFinite(result)
-    ? result.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
-    : "--"
+  const delta    = primaryRaw - cmpRaw
+  const pct      = (delta / Math.abs(cmpRaw)) * 100
+  const isUp     = delta > 0
+  const isNeutral = delta === 0
+  const polarity  = widget?.polarity ?? "higher"
+  const isGood    = isNeutral ? null : polarity === "higher" ? isUp : !isUp
+
+  const colorStyle = isNeutral ? "color:#94a3b8"
+    : isGood ? "color:#16a34a" : "color:#dc2626"
+  const arrow  = isNeutral ? "▶" : isUp ? "▲" : "▼"
+  const sign   = isUp ? "+" : ""
+  const dFmt   = kpiFormatNum(delta, widget?.numberFormat, widget?.decimals ?? 0)
+  const pFmt   = Math.abs(pct).toFixed(1) + "%"
+  const lbl    = widget?.comparisonLabel ? ` ${escapeHtml(widget.comparisonLabel)}` : ""
+
+  return `<div class="kpi-delta" style="${colorStyle}">${arrow} ${sign}${escapeHtml(dFmt)} (${sign}${escapeHtml(pFmt)})${lbl}</div>`
 }
 
 function computeHtmlCell(row: any[], columns: any[], col: any): string {

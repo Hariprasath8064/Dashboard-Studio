@@ -65,26 +65,36 @@ body{
  flex-shrink:0;
 }
 .kpi-inner{
- padding:16px 20px;
+ padding:14px 18px;
  height:100%;
  display:flex;
  flex-direction:column;
  align-items:center;
  justify-content:center;
- gap:6px;
+ gap:4px;
+}
+.kpi-label-txt{
+ font-size:11px;
+ font-weight:600;
+ color:#64748b;
+ text-transform:uppercase;
+ letter-spacing:0.06em;
+ text-align:center;
+ max-width:100%;
+ overflow:hidden;
+ text-overflow:ellipsis;
+ white-space:nowrap;
 }
 .kpi-val{
  font-size:36px;
  font-weight:700;
- line-height:1;
-}
-.kpi-label-txt{
- font-size:12px;
- font-weight:500;
- color:#5a5f66;
- text-transform:uppercase;
- letter-spacing:0.04em;
+ line-height:1.1;
  text-align:center;
+}
+.kpi-delta{
+ font-size:12px;
+ font-weight:600;
+ margin-top:2px;
 }
 .text-inner{
  padding:16px 18px;

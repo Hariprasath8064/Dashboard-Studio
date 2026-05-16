@@ -113,6 +113,17 @@ export interface KPIWidget extends WidgetBase {
 
   decimals?: number
 
+  // "auto" shrinks large numbers to K/M/B automatically
+  numberFormat?: "auto" | "full" | "k" | "m" | "b"
+
+  // Comparison / target
+  comparisonType?:   "none" | "column" | "target"
+  comparisonColumn?: string
+  comparisonTarget?: number
+  comparisonLabel?:  string
+  // "higher" = bigger value is good (green ▲), "lower" = smaller is good (green ▼)
+  polarity?: "higher" | "lower"
+
 }
 
 export interface ComputedColumn {
