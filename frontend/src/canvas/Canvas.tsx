@@ -57,6 +57,10 @@ export default function Canvas(){
 
  const { fieldGhost, handleFieldDragOver, handleFieldDragLeave, handleDrop } = useCanvasDrop(zoom)
 
+ // Changes whenever the chart palette changes — used as a key suffix to force
+ // chart widgets to remount and pick up the new colours from getActivePalette()
+ const paletteKey = activeTheme.chartPalette.join("|")
+
  const ZOOM_STEP = 10
  const MIN_ZOOM  = 25
  const MAX_ZOOM  = 200
@@ -209,7 +213,7 @@ export default function Canvas(){
       <CanvasGrid show={showGrid}/>
 
       {widgets.map(w => (
-       <CanvasWidget key={w.id} widget={w}/>
+       <CanvasWidget key={`${w.id}|${paletteKey}`} widget={w}/>
       ))}
 
       <SmartGuides />

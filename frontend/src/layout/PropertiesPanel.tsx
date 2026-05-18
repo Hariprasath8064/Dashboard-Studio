@@ -12,6 +12,7 @@ import LayoutPanel from "../properties/panels/LayoutPanel"
 import DatasetFields from "../sidebar/DatasetFields"
 import ThemePanel from "../theme/ThemePanel"
 import { executeStructuredQuery, bigfixRawToDataset } from "../services/bigfixApi"
+import { datasetApi } from "../services/datasetApi"
 import type { BigfixQueryConfig } from "../types/bigfixTypes"
 import { EMPTY_BIGFIX_QUERY } from "../types/bigfixTypes"
 import type {
@@ -42,11 +43,13 @@ const TYPE_LABELS: Record<string, string> = {
 
 function BigfixQueryBuilder() {
 
- const bigfixSchema         = useDashboardStore(s => s.bigfixSchema)
- const savedConfig          = useDashboardStore(s => s.dashboard.bigfixQueryConfig)
- const setBigfixQueryConfig = useDashboardStore(s => s.setBigfixQueryConfig)
- const setDataset           = useDashboardStore(s => s.setDataset)
- const dataset              = useDashboardStore(s => s.dashboard.dataset)
+ const bigfixSchema           = useDashboardStore(s => s.bigfixSchema)
+ const savedConfig            = useDashboardStore(s => s.dashboard.bigfixQueryConfig)
+ const setBigfixQueryConfig   = useDashboardStore(s => s.setBigfixQueryConfig)
+ const setDataset             = useDashboardStore(s => s.setDataset)
+ const setSavedDatasetId      = useDashboardStore(s => s.setSavedDatasetId)
+ const setBigfixFetchedAt     = useDashboardStore(s => s.setBigfixFetchedAt)
+ const dataset                = useDashboardStore(s => s.dashboard.dataset)
 
  const [cfg, setCfg]               = useState<BigfixQueryConfig>(savedConfig ?? EMPTY_BIGFIX_QUERY)
  const [sites]                     = useState<string[]>([])
@@ -116,7 +119,18 @@ function BigfixQueryBuilder() {
    const ds = bigfixRawToDataset(rawData, propsToFetch, cfg.dimension, cfg.metric, cfg.additionalProps, bigfixSchema!, cfg.objectType)
 
    setBigfixQueryConfig(cfg)
-   setDataset(ds, `BigFix: ${cfg.objectType}`, null)
+
+   // Persist snapshot so it can be restored when the dashboard is re-opened
+   const name = `BigFix: ${cfg.objectType}`
+   let datasetId: string | null = null
+   try {
+    const saved = await datasetApi.save(name, ds)
+    datasetId = saved.id
+    setSavedDatasetId(saved.id)
+   } catch { /* backend offline — continue without snapshot */ }
+
+   setDataset(ds, name, datasetId)
+   setBigfixFetchedAt(new Date().toISOString())
   } catch (err: any) {
    setFetchError(String(err?.message ?? err))
   } finally {

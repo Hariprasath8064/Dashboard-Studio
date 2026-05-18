@@ -3,6 +3,20 @@ import { loadDataset } from "../services/DatasetService"
 import { datasetApi, type SavedDatasetMeta } from "../services/datasetApi"
 import { fetchInspectorSchema } from "../services/bigfixApi"
 import { useDashboardStore } from "../store/dashboardStore"
+import { useBigfixAutoRefresh } from "../hooks/useBigfixAutoRefresh"
+
+function formatFetchedAt(iso: string): string {
+  const d = new Date(iso)
+  const now = Date.now()
+  const diff = Math.floor((now - d.getTime()) / 1000)
+  if (diff < 60)  return "Data fetched just now"
+  if (diff < 3600) return `Data from ${Math.floor(diff / 60)} min ago`
+  const today = new Date()
+  if (d.toDateString() === today.toDateString()) {
+    return `Data from today at ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+  }
+  return `Data from ${d.toLocaleDateString([], { month: "short", day: "numeric" })} at ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+}
 
 export default function DatasetPanel() {
 
@@ -15,6 +29,9 @@ export default function DatasetPanel() {
   const bigfixSchema      = useDashboardStore((s) => s.bigfixSchema)
   const setBigfixMode     = useDashboardStore((s) => s.setBigfixMode)
   const setBigfixSchema   = useDashboardStore((s) => s.setBigfixSchema)
+  const bigfixFetchedAt   = useDashboardStore((s) => s.dashboard.bigfixFetchedAt)
+
+  const { status: refreshStatus, refresh } = useBigfixAutoRefresh()
 
   const [dragging, setDragging]           = useState(false)
   const [loading, setLoading]             = useState(false)
@@ -191,6 +208,42 @@ export default function DatasetPanel() {
                   {dataset.rows.length} rows · {dataset.columns.length} fields loaded
                 </div>
               )}
+
+              {/* Data freshness indicator */}
+              <div className="bf-freshness">
+                <span className="bf-freshness-ts">
+                  {refreshStatus === "refreshing" && (
+                    <>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" style={{ animation: "spin .8s linear infinite", verticalAlign: "middle", marginRight: 4 }}>
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2.5" strokeDasharray="40 20" strokeLinecap="round"/>
+                      </svg>
+                      Refreshing…
+                    </>
+                  )}
+                  {refreshStatus === "done" && (
+                    <>
+                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none" style={{ verticalAlign: "middle", marginRight: 4 }}>
+                        <path d="M2 6l3 3 5-5" stroke="#16a34a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      Updated just now
+                    </>
+                  )}
+                  {refreshStatus === "error" && "Refresh failed"}
+                  {refreshStatus === "idle" && bigfixFetchedAt && formatFetchedAt(bigfixFetchedAt)}
+                </span>
+                {refreshStatus !== "refreshing" && (
+                  <button
+                    className="bf-refresh-btn"
+                    onClick={refresh}
+                    title="Refresh data from BigFix"
+                    disabled={!bigfixSchema}
+                  >
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+                      <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </div>

@@ -54,9 +54,12 @@ interface DashboardStore extends DashboardState {
   setSavedDatasetId:   (id: string | null) => void
 
   bigfixSchema: BigfixSchema | null
+  bigfixPendingRefresh: boolean
   setBigfixMode: (mode: boolean) => void
   setBigfixSchema: (schema: BigfixSchema) => void
   setBigfixQueryConfig: (config: BigfixQueryConfig) => void
+  setBigfixFetchedAt: (ts: string) => void
+  setBigfixPendingRefresh: (v: boolean) => void
 
   setTheme: (theme: ThemeConfig) => void
 
@@ -82,7 +85,8 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
   future:            [],
   guideLines:        { vertical: [], horizontal: [] },
   datasetName:       null,
-  bigfixSchema:      null,
+  bigfixSchema:         null,
+  bigfixPendingRefresh: false,
 
   ...createWidgetSlice(set),
   ...createSelectionSlice(set),
@@ -102,6 +106,14 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
     set((state: any) => ({
       dashboard: { ...state.dashboard, bigfixQueryConfig: config },
     })),
+
+  setBigfixFetchedAt: (ts: string) =>
+    set((state: any) => ({
+      dashboard: { ...state.dashboard, bigfixFetchedAt: ts },
+    })),
+
+  setBigfixPendingRefresh: (v: boolean) =>
+    set(() => ({ bigfixPendingRefresh: v })),
 
   setTheme: (theme: ThemeConfig) =>
     set((state: any) => ({

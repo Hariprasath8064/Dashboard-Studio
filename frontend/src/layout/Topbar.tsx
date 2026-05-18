@@ -11,13 +11,14 @@ interface Props {
 
 export default function Topbar({ view, setView }: Props) {
 
-  const dashboard          = useDashboardStore((s) => s.dashboard)
-  const renameDashboard    = useDashboardStore((s) => s.renameDashboard)
-  const resetDashboard     = useDashboardStore((s) => s.resetDashboard)
-  const savedDashboardId   = useDashboardStore((s) => s.savedDashboardId)
-  const savedDatasetId     = useDashboardStore((s) => s.savedDatasetId)
-  const setSavedDashboardId = useDashboardStore((s) => s.setSavedDashboardId)
-  const setDataset         = useDashboardStore((s) => s.setDataset)
+  const dashboard               = useDashboardStore((s) => s.dashboard)
+  const renameDashboard         = useDashboardStore((s) => s.renameDashboard)
+  const resetDashboard          = useDashboardStore((s) => s.resetDashboard)
+  const savedDashboardId        = useDashboardStore((s) => s.savedDashboardId)
+  const savedDatasetId          = useDashboardStore((s) => s.savedDatasetId)
+  const setSavedDashboardId     = useDashboardStore((s) => s.setSavedDashboardId)
+  const setDataset              = useDashboardStore((s) => s.setDataset)
+  const setBigfixPendingRefresh = useDashboardStore((s) => s.setBigfixPendingRefresh)
 
   const [editing, setEditing]     = useState(false)
   const [nameInput, setNameInput] = useState("")
@@ -80,10 +81,13 @@ export default function Topbar({ view, setView }: Props) {
     setSaveStatus("")
     try {
       const canvasPayload = {
-        widgets:    dashboard.widgets,
-        canvas:     dashboard.canvas,
-        background: dashboard.background,
-        theme:      dashboard.theme,
+        widgets:           dashboard.widgets,
+        canvas:            dashboard.canvas,
+        background:        dashboard.background,
+        theme:             dashboard.theme,
+        bigfixMode:        dashboard.bigfixMode,
+        bigfixQueryConfig: dashboard.bigfixQueryConfig,
+        bigfixFetchedAt:   dashboard.bigfixFetchedAt,
       }
       const payload = {
         name:       dashboard.name,
@@ -234,6 +238,7 @@ export default function Topbar({ view, setView }: Props) {
           setDataset={setDataset}
           setSavedDashboardId={setSavedDashboardId}
           resetDashboard={resetDashboard}
+          setBigfixPendingRefresh={setBigfixPendingRefresh}
         />
       )}
 

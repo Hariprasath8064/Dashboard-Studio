@@ -9,9 +9,10 @@ interface Props {
   setDataset: (dataset: Dataset, name: string, datasetId?: string | null) => void
   setSavedDashboardId: (id: string | null) => void
   resetDashboard: (data: any) => void
+  setBigfixPendingRefresh: (v: boolean) => void
 }
 
-export default function DashboardGallery({ onClose, onLoad, setDataset, setSavedDashboardId, resetDashboard }: Props) {
+export default function DashboardGallery({ onClose, onLoad, setDataset, setSavedDashboardId, resetDashboard, setBigfixPendingRefresh }: Props) {
   const [items, setItems]     = useState<DashboardMeta[]>([])
   const [loading, setLoading] = useState(true)
   const [opening, setOpening] = useState<string | null>(null)
@@ -29,28 +30,41 @@ export default function DashboardGallery({ onClose, onLoad, setDataset, setSaved
       const loaded = await dashboardApi.get(meta.id)
       const parsed = JSON.parse(loaded.canvas_json)
       resetDashboard({
-        id:         meta.id,
-        name:       meta.name,
-        canvas:     parsed.canvas     ?? { width: 1200, height: 720 },
-        background: parsed.background ?? { color: "#f4f6f9" },
-        widgets:    parsed.widgets    ?? [],
-        dataset:    null,
+        id:                meta.id,
+        name:              meta.name,
+        canvas:            parsed.canvas            ?? { width: 1200, height: 720 },
+        background:        parsed.background        ?? { color: "#f4f6f9" },
+        widgets:           parsed.widgets           ?? [],
+        theme:             parsed.theme,
+        dataset:           null,
+        bigfixMode:        parsed.bigfixMode        ?? false,
+        bigfixQueryConfig: parsed.bigfixQueryConfig ?? undefined,
+        bigfixFetchedAt:   parsed.bigfixFetchedAt   ?? undefined,
       })
       setSavedDashboardId(meta.id)
 
-      // Rehydrate dataset if available
+      // Rehydrate snapshot dataset (Excel or BigFix) from the linked dataset record
+      const datasetLabel = meta.dataset_name
+        ?? (parsed.bigfixMode && parsed.bigfixQueryConfig?.objectType
+          ? `BigFix: ${parsed.bigfixQueryConfig.objectType}`
+          : "dataset")
+
       if (loaded.dataset_id && loaded.dataset) {
         try {
           const ds: Dataset = JSON.parse(loaded.dataset)
-          setDataset(ds, meta.dataset_name ?? "dataset", loaded.dataset_id)
+          setDataset(ds, datasetLabel, loaded.dataset_id)
         } catch { /* ignore parse failure */ }
       } else if (loaded.dataset_id) {
-        // Fallback: fetch from /datasets/:id
         try {
           const row = await datasetApi.get(loaded.dataset_id)
           const ds: Dataset = JSON.parse(row.data)
-          setDataset(ds, meta.dataset_name ?? "dataset", loaded.dataset_id)
+          setDataset(ds, datasetLabel, loaded.dataset_id)
         } catch { /* ignore */ }
+      }
+
+      // If this is a BigFix dashboard, queue a background refresh once schema loads
+      if (parsed.bigfixMode && parsed.bigfixQueryConfig?.objectType && parsed.bigfixQueryConfig?.dimension) {
+        setBigfixPendingRefresh(true)
       }
 
       onLoad(meta.id)

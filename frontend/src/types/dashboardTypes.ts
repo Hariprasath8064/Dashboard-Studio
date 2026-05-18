@@ -36,6 +36,9 @@ export interface Dashboard {
   /** Active theme — controls colours, palette, font and border-radius across the canvas */
   theme?: ThemeConfig
 
+  /** ISO timestamp of the last successful BigFix data fetch */
+  bigfixFetchedAt?: string
+
 }
 
 export interface DashboardState {
