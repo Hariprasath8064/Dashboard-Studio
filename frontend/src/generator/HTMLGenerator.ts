@@ -3,6 +3,7 @@ import { EXPORT_STYLES }   from "./export/exportStyles"
 import { renderWidgetHTML } from "./export/widgetHTML"
 import { setGeneratorPalette, resetGeneratorPalette } from "./scripts/shared"
 import { DEFAULT_THEME, type ThemeConfig } from "../theme/themePresets"
+import { DRILL_DOWN_STYLES, DRILL_DOWN_HTML, buildDrillDownScript } from "./export/drillDownExport"
 
 /**
  * Builds a minimal CSS block that overrides the exported HTML's :root variables
@@ -81,6 +82,11 @@ ${chartBlocks.join("\n")}
   // Reset palette to defaults after building so repeated exports start clean
   resetGeneratorPalette()
 
+  const hasDrillDown = widgets.some((w: any) => w.drillDown?.enabled)
+  const ddScript     = hasDrillDown
+    ? buildDrillDownScript(datasetColumns, datasetRows)
+    : ""
+
   return `
 <!DOCTYPE html>
 <html>
@@ -90,6 +96,7 @@ ${chartBlocks.join("\n")}
  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
  <style>${EXPORT_STYLES}</style>
  <style>${buildThemeStyleBlock(theme, canvasBg)}</style>
+ ${hasDrillDown ? `<style>${DRILL_DOWN_STYLES}</style>` : ""}
 </head>
 <body>
  <div class="export-shell">
@@ -101,7 +108,11 @@ ${chartBlocks.join("\n")}
   </div>
  </div>
 
+ ${hasDrillDown ? DRILL_DOWN_HTML : ""}
+
  ${chartsSection}
+
+ ${ddScript ? `<script>${ddScript}</script>` : ""}
 
 </body>
 

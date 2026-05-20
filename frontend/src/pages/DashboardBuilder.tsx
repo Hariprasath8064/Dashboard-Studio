@@ -5,6 +5,7 @@ import Sidebar        from "../layout/Sidebar"
 import Canvas         from "../canvas/Canvas"
 import PropertiesPanel from "../layout/PropertiesPanel"
 import TrashZone      from "../layout/TrashZone"
+import DrillDownModal from "../widgets/DrillDown/DrillDownModal"
 
 import CodePreview from "./CodePreview"
 import PreviewPage from "./PreviewPage"
@@ -93,6 +94,8 @@ export default function DashboardBuilder(){
    )}
 
    {view==="design" && <TrashZone/>}
+
+   {view==="design" && <DrillDownModal/>}
 
   </div>
 

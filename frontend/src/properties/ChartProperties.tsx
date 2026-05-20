@@ -3,6 +3,7 @@ import { useDashboardStore } from "../store/dashboardStore"
 import type { ChartWidget, ColorRule } from "../types/widgetTypes"
 import { runAggregation } from "../dataset/QueryEngine"
 import { chartColors } from "../constants/chartColors"
+import DrillDownProperties from "./DrillDownProperties"
 
 interface Props {
   widget: ChartWidget
@@ -253,6 +254,11 @@ export default function ChartProperties({ widget }: Props) {
           )}
         </>
       )}
+
+      <DrillDownProperties
+        drillDown={widget.drillDown}
+        onChange={cfg => set("drillDown", cfg)}
+      />
 
       {/* ── Slice value preview ── */}
       {(widget.type === "donut" || widget.type === "pie") && donutSlices.length > 0 && (

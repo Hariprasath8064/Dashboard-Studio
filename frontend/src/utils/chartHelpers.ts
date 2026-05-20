@@ -141,6 +141,28 @@ export const dataLabelPlugin = {
   }
 }
 
+/** Line/area point styling + hit area so tooltips and drill-down clicks register reliably */
+export function linePointDatasetOpts(color: string) {
+  return {
+    borderWidth: 2,
+    pointRadius: 4,
+    pointHoverRadius: 8,
+    pointHitRadius: 18,
+    pointBackgroundColor: color,
+    pointBorderColor: "#ffffff",
+    pointBorderWidth: 2,
+  }
+}
+
+/** Hover tooltip + click target along the x-axis column, not only on the tiny dot */
+export const LINE_CHART_INTERACTION = {
+  interaction: { mode: "index" as const, intersect: false },
+  hover:       { mode: "index" as const, intersect: false },
+  elements: {
+    point: { radius: 4, hitRadius: 18, hoverRadius: 8 },
+  },
+}
+
 /** Build standard Chart.js scales config from widget axis options */
 export function buildScalesConfig(widget: ChartWidget, extra: Record<string, any> = {}) {
   const fontSize = widget.axisFontSize || 11

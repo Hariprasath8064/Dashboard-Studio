@@ -3,8 +3,9 @@ import Chart from "chart.js/auto"
 import type { ChartWidget } from "../../types/widgetTypes"
 import { useDashboardStore } from "../../store/dashboardStore"
 import { runAggregation } from "../../dataset/QueryEngine"
-import { applyFilter, buildScalesConfig } from "../../utils/chartHelpers"
+import { applyFilter, buildScalesConfig, linePointDatasetOpts, LINE_CHART_INTERACTION } from "../../utils/chartHelpers"
 import { chartColors } from "../../constants/chartColors"
+import { buildDrillDownClick } from "../../utils/drillDownHelpers"
 
 interface Props {
   widget: ChartWidget
@@ -36,17 +37,20 @@ export default function LineChartWidget({ widget }: Props) {
       backgroundColor: color,
       tension: 0.3,
       yAxisID: "y",
+      ...linePointDatasetOpts(color),
     }]
 
     if (widget.y2Column && widget.y2Column !== widget.query.yColumn) {
       const r2 = runAggregation(dataset, widget.query.xColumn!, widget.y2Column, (widget.y2Aggregation || widget.query.aggregation)!)
+      const c2 = widget.y2Color || chartColors[1]
       datasets.push({
         label: widget.y2Column,
         data: r2.values,
-        borderColor: widget.y2Color || chartColors[1],
-        backgroundColor: widget.y2Color || chartColors[1],
+        borderColor: c2,
+        backgroundColor: c2,
         tension: 0.3,
         yAxisID: "y2",
+        ...linePointDatasetOpts(c2),
       })
     }
 
@@ -60,8 +64,13 @@ export default function LineChartWidget({ widget }: Props) {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { display: widget.showLegend !== false } },
+        ...LINE_CHART_INTERACTION,
+        plugins: {
+          legend: { display: widget.showLegend !== false },
+          tooltip: { enabled: true },
+        },
         scales,
+        onClick: buildDrillDownClick(widget, result.labels),
       }
     })
 

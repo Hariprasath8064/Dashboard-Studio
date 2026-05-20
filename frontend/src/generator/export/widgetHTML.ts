@@ -36,10 +36,15 @@ export function renderWidgetHTML(widget: any, columns: any[], rows: any[]): stri
       const suffix      = escapeHtml(widget?.suffix || "")
       const mainVal     = buildKpiValue(widget, columns, rows)
       const deltaHtml   = buildKpiDelta(widget, columns, rows)
+      const kpiDd       = widget?.drillDown?.enabled
+      const kpiDdCols   = JSON.stringify(widget?.drillDown?.displayColumns ?? [])
+      const kpiClick    = kpiDd
+        ? `onclick="__showDrillDown(null,null,${kpiDdCols})" style="cursor:pointer;" title="Click to see detail rows"`
+        : ""
       return `
    <div class="widget" style="${frameStyle}">
     <div class="widget-inner">
-     <div class="kpi-inner">
+     <div class="kpi-inner" ${kpiClick}>
       <div class="kpi-label-txt">${escapeHtml(widget?.label || "KPI")}</div>
       <div class="kpi-val" style="${kpiColor}${kpiFontSize}">${prefix}${mainVal}${suffix}</div>
       ${deltaHtml}

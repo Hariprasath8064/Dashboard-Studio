@@ -5,6 +5,7 @@ import { useDashboardStore } from "../../store/dashboardStore"
 import { runAggregation } from "../../dataset/QueryEngine"
 import { applyFilter, resolveConditionalColors, dataLabelPlugin, multiColorLegendLabels } from "../../utils/chartHelpers"
 import { chartColors } from "../../constants/chartColors"
+import { buildDrillDownClick } from "../../utils/drillDownHelpers"
 
 interface Props { widget: ChartWidget }
 
@@ -56,6 +57,7 @@ export default function StackedBarWidget({ widget }: Props) {
         plugins: {
           legend: { display: widget.showLegend !== false, labels: multiColorLegendLabels },
         },
+        onClick: buildDrillDownClick(widget, result.labels),
         scales: {
           x: {
             stacked: true,

@@ -4,6 +4,7 @@ import type { ChartWidget } from "../../types/widgetTypes"
 import { useDashboardStore } from "../../store/dashboardStore"
 import { runAggregation } from "../../dataset/QueryEngine"
 import { resolveColors } from "../../utils/chartHelpers"
+import { buildDrillDownClick } from "../../utils/drillDownHelpers"
 
 interface Props { widget: ChartWidget }
 
@@ -32,7 +33,8 @@ export default function PieChartWidget({ widget }: Props) {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { display: widget.showLegend !== false } }
+        plugins: { legend: { display: widget.showLegend !== false } },
+        onClick: buildDrillDownClick(widget, result.labels),
       }
     })
 

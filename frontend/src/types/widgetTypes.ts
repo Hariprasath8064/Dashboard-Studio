@@ -1,5 +1,10 @@
 import type { DatasetQuery, AggregationType } from "./datasetTypes"
 
+export interface DrillDownConfig {
+  enabled: boolean
+  displayColumns?: string[]   // empty / undefined = all columns
+}
+
 export type WidgetType =
   | "bar"
   | "line"
@@ -85,6 +90,8 @@ export interface ChartWidget extends WidgetBase {
   // ── Filter ──
   filterTopN?: number
 
+  drillDown?: DrillDownConfig
+
   // ── Gauge sub-text ──
   gaugeText?: string
   gaugeTextSize?: number
@@ -123,6 +130,8 @@ export interface KPIWidget extends WidgetBase {
   comparisonLabel?:  string
   // "higher" = bigger value is good (green ▲), "lower" = smaller is good (green ▼)
   polarity?: "higher" | "lower"
+
+  drillDown?: DrillDownConfig
 
 }
 

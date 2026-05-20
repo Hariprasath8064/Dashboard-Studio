@@ -5,6 +5,7 @@ import { useDashboardStore } from "../../store/dashboardStore"
 import { runAggregation } from "../../dataset/QueryEngine"
 import { applyFilter, resolveConditionalColors, dataLabelPlugin, buildScalesConfig, multiColorLegendLabels } from "../../utils/chartHelpers"
 import { chartColors } from "../../constants/chartColors"
+import { buildDrillDownClick } from "../../utils/drillDownHelpers"
 
 interface Props {
   widget: ChartWidget
@@ -66,6 +67,7 @@ export default function BarChartWidget({ widget }: Props) {
           legend: { display: widget.showLegend !== false, labels: multiColorLegendLabels },
         },
         scales,
+        onClick: buildDrillDownClick(widget, result.labels),
       },
       plugins: widget.showDataLabels ? [dataLabelPlugin] : []
     })

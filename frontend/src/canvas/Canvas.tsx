@@ -109,7 +109,6 @@ export default function Canvas(){
  }
 
  return(
-
   <div id="canvas-area">
 
    <div id="canvas-toolbar">

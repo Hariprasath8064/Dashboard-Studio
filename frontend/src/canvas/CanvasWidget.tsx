@@ -3,6 +3,7 @@ import { useDashboardStore } from "../store/dashboardStore"
 import type { Widget } from "../types/widgetTypes"
 import ResizeHandles from "./ResizeHandles"
 import { useWidgetDrag } from "../hooks/useWidgetDrag"
+import { isDrillDownEnabled } from "../utils/drillDownHelpers"
 
 import BarChartWidget  from "../widgets/BarChart/BarChartWidget"
 import LineChartWidget from "../widgets/LineChart/LineChartWidget"
@@ -38,6 +39,7 @@ export default function CanvasWidget({ widget }: Props) {
   const selected          = selectedWidgetIds.includes(widget.id)
 
   const { ghostPos, startDrag } = useWidgetDrag(widget)
+  const drillEnabled = isDrillDownEnabled(widget)
 
   function onDrop(e: React.DragEvent) {
     e.stopPropagation()  // prevent canvas from also creating a new widget
@@ -98,7 +100,7 @@ export default function CanvasWidget({ widget }: Props) {
   return (
     <>
       <div
-        className={`widget${selected ? " selected" : ""}${ghostPos ? " is-dragging" : ""}`}
+        className={`widget${selected ? " selected" : ""}${ghostPos ? " is-dragging" : ""}${drillEnabled ? " widget-drill-enabled" : ""}`}
         style={{
           left:   widget.position.x,
           top:    widget.position.y,
@@ -116,8 +118,9 @@ export default function CanvasWidget({ widget }: Props) {
       >
 
         <div
-          className="widget-drag-area"
+          className={`widget-drag-area${drillEnabled ? " widget-drag-area--header" : ""}`}
           onMouseDown={startDrag}
+          title={drillEnabled ? "Drag here to move" : undefined}
         />
 
         <div className="widget-inner">

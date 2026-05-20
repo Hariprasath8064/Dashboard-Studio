@@ -4,6 +4,13 @@ import type { Widget } from "../types/widgetTypes"
 import type { Dataset } from "../types/datasetTypes"
 import type { BigfixSchema, BigfixQueryConfig } from "../types/bigfixTypes"
 import type { ThemeConfig } from "../theme/themePresets"
+
+export interface DrillDownPayload {
+  widgetTitle: string
+  filterLabel: string | null   // null = show all rows (KPI)
+  filterColumn: string | null  // null = no column filter
+  displayColumns: string[]     // empty = show all dataset columns
+}
 import { createWidgetSlice }    from "./slices/widgetSlice"
 import { createSelectionSlice } from "./slices/selectionSlice"
 import { createClipboardSlice } from "./slices/clipboardSlice"
@@ -63,6 +70,10 @@ interface DashboardStore extends DashboardState {
 
   setTheme: (theme: ThemeConfig) => void
 
+  drillDown: DrillDownPayload | null
+  openDrillDown: (payload: DrillDownPayload) => void
+  closeDrillDown: () => void
+
 }
 
 export const useDashboardStore = create<DashboardStore>((set, get) => ({
@@ -87,6 +98,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
   datasetName:       null,
   bigfixSchema:         null,
   bigfixPendingRefresh: false,
+  drillDown:            null,
 
   ...createWidgetSlice(set),
   ...createSelectionSlice(set),
@@ -123,5 +135,8 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
         background: { ...state.dashboard.background, color: theme.dashboardBg },
       },
     })),
+
+  openDrillDown:  (payload) => set(() => ({ drillDown: payload })),
+  closeDrillDown: ()        => set(() => ({ drillDown: null })),
 
 }))

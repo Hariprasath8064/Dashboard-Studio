@@ -1,5 +1,6 @@
 import type { KPIWidget } from "../types/widgetTypes"
 import { useDashboardStore } from "../store/dashboardStore"
+import DrillDownProperties from "./DrillDownProperties"
 
 const AGGREGATIONS  = ["SUM", "AVG", "COUNT", "MIN", "MAX"]
 const NUM_FORMATS   = [
@@ -225,6 +226,11 @@ export default function KPIProperties({ widget }: Props) {
           </div>
         </>
       )}
+
+      <DrillDownProperties
+        drillDown={widget.drillDown}
+        onChange={cfg => upd({ drillDown: cfg })}
+      />
 
     </div>
   )

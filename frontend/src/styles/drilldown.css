@@ -1,0 +1,265 @@
+/* ── DRILL-DOWN MODAL ── */
+
+/* Hide canvas/charts while modal is open — prevents Chart.js GPU layers painting on top */
+body.dd-open {
+  overflow: hidden;
+}
+
+body.dd-open #canvas-area,
+body.dd-open .export-dashboard {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.dd-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, .55);
+  z-index: 2147483000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: dd-fade-in .12s ease;
+}
+
+@keyframes dd-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.dd-modal {
+  background: var(--surface, #fff);
+  border-radius: 10px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.22), 0 2px 8px rgba(0,0,0,.1);
+  width: min(920px, calc(100vw - 80px));
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: dd-slide-up .14s ease;
+  position: relative;
+  z-index: 2147483001;
+}
+
+@keyframes dd-slide-up {
+  from { transform: translateY(14px); opacity: .6; }
+  to   { transform: translateY(0);    opacity: 1;  }
+}
+
+/* ── Header ── */
+.dd-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border, #e3e6ea);
+  flex-shrink: 0;
+}
+
+.dd-title-block {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.dd-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text1, #1b1f24);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dd-label-badge {
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--accent, #2b7cff);
+  color: #fff;
+  border-radius: 4px;
+  padding: 2px 8px;
+  flex-shrink: 0;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dd-count {
+  font-size: 12px;
+  color: var(--text3, #94a3b8);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dd-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--text3, #94a3b8);
+  cursor: pointer;
+  border-radius: 6px;
+  flex-shrink: 0;
+  transition: background .12s, color .12s;
+  padding: 0;
+}
+
+.dd-close:hover {
+  background: var(--hover, #f1f5f9);
+  color: var(--text1, #1b1f24);
+}
+
+/* ── Toolbar ── */
+.dd-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border, #e3e6ea);
+  flex-shrink: 0;
+}
+
+.dd-search-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg2, #eef2f6);
+  border: 1px solid var(--border, #e3e6ea);
+  border-radius: 6px;
+  padding: 0 10px;
+  height: 30px;
+  color: var(--text3, #94a3b8);
+}
+
+.dd-search-wrap:focus-within {
+  border-color: var(--accent, #2b7cff);
+  box-shadow: 0 0 0 2px rgba(43,124,255,.12);
+}
+
+.dd-search {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 12px;
+  color: var(--text1, #1b1f24);
+}
+
+.dd-search::placeholder { color: var(--text3, #94a3b8); }
+
+.dd-search-clear {
+  border: none;
+  background: transparent;
+  color: var(--text3, #94a3b8);
+  cursor: pointer;
+  font-size: 15px;
+  padding: 0;
+  line-height: 1;
+}
+
+.dd-search-clear:hover { color: var(--text1, #1b1f24); }
+
+.dd-csv-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--border, #e3e6ea);
+  background: var(--surface, #fff);
+  color: var(--text2, #475569);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background .12s, border-color .12s, color .12s;
+}
+
+.dd-csv-btn:hover {
+  background: var(--accent, #2b7cff);
+  border-color: var(--accent, #2b7cff);
+  color: #fff;
+}
+
+/* ── Table ── */
+.dd-table-wrap {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}
+
+.dd-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.dd-table thead {
+  position: sticky;
+  top: 0;
+  background: var(--bg2, #eef2f6);
+  z-index: 1;
+}
+
+.dd-table th {
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text3, #64748b);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  border-bottom: 1px solid var(--border, #e3e6ea);
+  white-space: nowrap;
+}
+
+.dd-th-rn {
+  width: 40px;
+  text-align: center !important;
+}
+
+.dd-table td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border, #e3e6ea);
+  color: var(--text1, #1b1f24);
+  white-space: nowrap;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dd-td-rn {
+  text-align: center;
+  color: var(--text3, #94a3b8);
+  font-size: 11px;
+}
+
+.dd-tr-alt { background: var(--bg2, #f8fafc); }
+
+.dd-table tbody tr:hover { background: var(--hover, #f1f5f9); }
+
+.dd-empty {
+  text-align: center !important;
+  color: var(--text3, #94a3b8) !important;
+  padding: 36px 0 !important;
+  font-size: 13px;
+}
+
+/* ── KPI clickable state ── */
+.kpi-clickable {
+  cursor: pointer;
+  transition: box-shadow .15s;
+}
+
+.kpi-clickable:hover {
+  box-shadow: 0 0 0 2px var(--accent, #2b7cff) inset;
+  border-radius: 6px;
+}

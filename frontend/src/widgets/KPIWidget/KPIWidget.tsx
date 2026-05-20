@@ -1,5 +1,6 @@
 import { useDashboardStore } from "../../store/dashboardStore"
 import type { KPIWidget as KPIType } from "../../types/widgetTypes"
+import { buildKpiDrillDownClick } from "../../utils/drillDownHelpers"
 
 interface Props {
   widget: KPIType
@@ -130,8 +131,13 @@ export default function KPIWidget({ widget }: Props) {
 
   const fontSize = widget.fontSize || 36
 
+  const onKpiClick = buildKpiDrillDownClick(widget)
+
   return (
-    <div className="kpi-inner">
+    <div
+      className={`kpi-inner${onKpiClick ? " kpi-clickable" : ""}`}
+      onClick={onKpiClick}
+    >
 
       <div className="kpi-label-txt">
         {widget.label || "KPI"}
