@@ -413,8 +413,7 @@ export default function PropertiesPanel(){
 
  const widget = widgets.find(w => w.id === selectedId)
 
- const [tab, setTab]       = useState<"fields" | "theme">("fields")
- const [widgetTab, setWidgetTab] = useState("data")
+ const [tab, setTab] = useState<"fields" | "theme">("fields")
 
  useEffect(() => {
   if (selectedId) setTab("theme")
@@ -458,17 +457,10 @@ export default function PropertiesPanel(){
        Properties
        <span className="pp-badge">{TYPE_LABELS[widget.type] || widget.type}</span>
       </div>
-
-      <div className="props-tabs">
-       <button className={widgetTab === "data"   ? "active" : ""} onClick={() => setWidgetTab("data")}>Data</button>
-       <button className={widgetTab === "style"  ? "active" : ""} onClick={() => setWidgetTab("style")}>Style</button>
-       <button className={widgetTab === "layout" ? "active" : ""} onClick={() => setWidgetTab("layout")}>Layout</button>
-      </div>
-
       <div className="pp-scroll">
-       {widgetTab === "data"   && renderDataPanel(widget)}
-       {widgetTab === "style"  && <StylePanel  widget={widget} />}
-       {widgetTab === "layout" && <LayoutPanel widget={widget} />}
+       {renderDataPanel(widget)}
+       <StylePanel  widget={widget} />
+       <LayoutPanel widget={widget} />
       </div>
      </>
     ) : (

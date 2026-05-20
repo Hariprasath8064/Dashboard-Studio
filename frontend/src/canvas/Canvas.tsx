@@ -188,11 +188,17 @@ export default function Canvas(){
    <div
     id="canvas-scroll"
     ref={scrollRef}
-    style={{ backgroundColor: activeTheme.canvasBg }}
+    style={activeTheme.canvasBg ? { backgroundColor: activeTheme.canvasBg } : undefined}
    >
 
-    {/* Wrapper keeps resize handles outside the CSS transform */}
-    <div style={{ position: "relative", display: "inline-block" }}>
+    {/* Outer wrapper uses visual (scaled) dimensions so justify-content:center
+        in #canvas-scroll centres correctly at every zoom level */}
+    <div style={{
+      position: "relative",
+      flexShrink: 0,
+      width:  canvas.width  * (zoom / 100),
+      height: dynamicHeight * (zoom / 100),
+    }}>
 
      <div
       id="canvas-frame"
@@ -211,6 +217,27 @@ export default function Canvas(){
      >
 
       <CanvasGrid show={showGrid}/>
+
+      {widgets.length === 0 && (
+       <div style={{
+        position: "absolute", inset: 0,
+        display: "flex", flexDirection: "column",
+        alignItems: "center", justifyContent: "center",
+        gap: 12, pointerEvents: "none",
+        color: "var(--text3)",
+       }}>
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style={{ opacity: .35 }}>
+         <rect x="4" y="4" width="17" height="17" rx="3" stroke="currentColor" strokeWidth="1.8"/>
+         <rect x="27" y="4" width="17" height="17" rx="3" stroke="currentColor" strokeWidth="1.8"/>
+         <rect x="4" y="27" width="17" height="17" rx="3" stroke="currentColor" strokeWidth="1.8"/>
+         <rect x="27" y="27" width="17" height="17" rx="3" stroke="currentColor" strokeWidth="1.8"/>
+        </svg>
+        <div style={{ textAlign: "center", lineHeight: 1.6 }}>
+         <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text2)", opacity: .7 }}>Start building</div>
+         <div style={{ fontSize: 12, marginTop: 4, opacity: .55 }}>Drag a component from the left panel</div>
+        </div>
+       </div>
+      )}
 
       {widgets.map(w => (
        <CanvasWidget key={`${w.id}|${paletteKey}`} widget={w}/>

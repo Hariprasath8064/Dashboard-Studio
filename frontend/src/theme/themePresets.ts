@@ -17,8 +17,8 @@ export interface ThemeConfig {
 export const PRESET_THEMES: ThemeConfig[] = [
   {
     id: "default", name: "Default",
-    canvasBg: "#f4f5f7", dashboardBg: "#f4f6f9",
-    widgetBg: "#ffffff", widgetBorder: "#e2e8f0", widgetRadius: 8,
+    canvasBg: "#e8eaed", dashboardBg: "#f4f6f9",
+    widgetBg: "#ffffff", widgetBorder: "#e2e8f0", widgetRadius: 4,
     textColor: "#1e293b", textSecondary: "#64748b", textMuted: "#94a3b8",
     accentColor: "#005EB8",
     fontFamily: "Inter, Arial, sans-serif",
@@ -27,7 +27,7 @@ export const PRESET_THEMES: ThemeConfig[] = [
   {
     id: "slate", name: "Slate",
     canvasBg: "#f1f5f9", dashboardBg: "#f8fafc",
-    widgetBg: "#ffffff", widgetBorder: "#cbd5e1", widgetRadius: 8,
+    widgetBg: "#ffffff", widgetBorder: "#cbd5e1", widgetRadius: 4,
     textColor: "#0f172a", textSecondary: "#475569", textMuted: "#94a3b8",
     accentColor: "#334155",
     fontFamily: "Inter, Arial, sans-serif",
@@ -36,7 +36,7 @@ export const PRESET_THEMES: ThemeConfig[] = [
   {
     id: "ocean", name: "Ocean",
     canvasBg: "#e0f2fe", dashboardBg: "#f0f9ff",
-    widgetBg: "#ffffff", widgetBorder: "#bae6fd", widgetRadius: 10,
+    widgetBg: "#ffffff", widgetBorder: "#bae6fd", widgetRadius: 6,
     textColor: "#0c4a6e", textSecondary: "#0369a1", textMuted: "#7dd3fc",
     accentColor: "#0284c7",
     fontFamily: "Inter, Arial, sans-serif",
@@ -45,7 +45,7 @@ export const PRESET_THEMES: ThemeConfig[] = [
   {
     id: "forest", name: "Forest",
     canvasBg: "#f0fdf4", dashboardBg: "#f7fef9",
-    widgetBg: "#ffffff", widgetBorder: "#bbf7d0", widgetRadius: 8,
+    widgetBg: "#ffffff", widgetBorder: "#bbf7d0", widgetRadius: 4,
     textColor: "#14532d", textSecondary: "#15803d", textMuted: "#86efac",
     accentColor: "#16a34a",
     fontFamily: "Inter, Arial, sans-serif",
@@ -54,7 +54,7 @@ export const PRESET_THEMES: ThemeConfig[] = [
   {
     id: "sunset", name: "Sunset",
     canvasBg: "#fff7ed", dashboardBg: "#fffbf5",
-    widgetBg: "#ffffff", widgetBorder: "#fed7aa", widgetRadius: 8,
+    widgetBg: "#ffffff", widgetBorder: "#fed7aa", widgetRadius: 4,
     textColor: "#431407", textSecondary: "#c2410c", textMuted: "#fdba74",
     accentColor: "#ea580c",
     fontFamily: "Inter, Arial, sans-serif",
@@ -63,7 +63,7 @@ export const PRESET_THEMES: ThemeConfig[] = [
   {
     id: "rose", name: "Rose",
     canvasBg: "#fff1f2", dashboardBg: "#fff5f6",
-    widgetBg: "#ffffff", widgetBorder: "#fecdd3", widgetRadius: 8,
+    widgetBg: "#ffffff", widgetBorder: "#fecdd3", widgetRadius: 4,
     textColor: "#881337", textSecondary: "#be123c", textMuted: "#fda4af",
     accentColor: "#e11d48",
     fontFamily: "Inter, Arial, sans-serif",
@@ -72,7 +72,7 @@ export const PRESET_THEMES: ThemeConfig[] = [
   {
     id: "midnight", name: "Midnight",
     canvasBg: "#0f172a", dashboardBg: "#1e293b",
-    widgetBg: "#1e293b", widgetBorder: "#334155", widgetRadius: 8,
+    widgetBg: "#1e293b", widgetBorder: "#334155", widgetRadius: 4,
     textColor: "#f1f5f9", textSecondary: "#94a3b8", textMuted: "#475569",
     accentColor: "#38bdf8",
     fontFamily: "Inter, Arial, sans-serif",
