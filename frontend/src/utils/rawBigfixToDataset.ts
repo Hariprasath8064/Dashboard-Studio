@@ -1,4 +1,5 @@
 import type { Dataset, DatasetColumn } from "../types/datasetTypes"
+import { inferColumnNamesFromRelevance } from "./bigfixColumnNames"
 
 function inferCellType(values: string[]): "number" | "string" {
   if (values.length === 0) return "string"
@@ -7,19 +8,22 @@ function inferCellType(values: string[]): "number" | "string" {
 }
 
 /** Turn raw BigFix evaluate rows into a widget-ready dataset. */
-export function rawBigfixToDataset(data: string[][]): Dataset {
+export function rawBigfixToDataset(data: string[][], relevanceQuery?: string): Dataset {
   if (!data.length) {
     return { columns: [{ name: "value", type: "string" }], rows: [] }
   }
 
   const colCount = Math.max(...data.map(r => r.length), 1)
+  const inferredNames = relevanceQuery
+    ? inferColumnNamesFromRelevance(relevanceQuery, colCount)
+    : []
   const columns: DatasetColumn[] = []
 
   for (let c = 0; c < colCount; c++) {
     const colValues = data.map(row => String(row[c] ?? "").trim())
     const type = inferCellType(colValues)
     columns.push({
-      name: colCount === 1 ? "value" : `Column ${c + 1}`,
+      name: inferredNames[c] ?? (colCount === 1 ? "value" : `Column ${c + 1}`),
       type,
     })
   }

@@ -14,7 +14,7 @@ export async function runCustomBigfixQuery(query: string): Promise<CustomQueryRe
   if (!trimmed) throw new Error("Query is empty.")
 
   const result = await evaluateBigfixQuery(trimmed, true)
-  const dataset = rawBigfixToDataset(result.data)
+  const dataset = rawBigfixToDataset(result.data, trimmed)
 
   return {
     dataset,
