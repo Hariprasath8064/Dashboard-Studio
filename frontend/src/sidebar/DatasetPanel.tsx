@@ -197,7 +197,7 @@ export default function DatasetPanel() {
               </div>
               <div style={{ color: "var(--text3)", fontSize: 11, lineHeight: 1.5 }}>
                 {bigfixSchema.objectsList.length} object types available.<br/>
-                Open the <strong>Fields</strong> panel on the right to build your query and fetch data.
+                Open the <strong>Fields</strong> tab to build your query and fetch data.
               </div>
               {dataset && (
                 <div style={{ marginTop: 6, color: "var(--text2)", fontSize: 11 }}>

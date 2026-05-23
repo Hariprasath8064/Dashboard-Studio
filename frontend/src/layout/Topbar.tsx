@@ -5,6 +5,7 @@ import { dashboardApi } from "../services/dashboardApi"
 import DashboardGallery from "../pages/DashboardGallery"
 
 import type { BuilderView } from "../store/slices/builderUiSlice"
+import AppLogo from "../components/AppLogo"
 
 interface Props {
   view: BuilderView
@@ -127,17 +128,7 @@ export default function Topbar({ view, setView }: Props) {
 
     <div id="topbar">
 
-      <div className="tb-logo">
-        <div className="tb-logo-mark">
-          <svg viewBox="0 0 14 14" width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="1" y="1" width="5" height="5" rx="1.2" fill="white"/>
-            <rect x="8" y="1" width="5" height="5" rx="1.2" fill="white" opacity=".7"/>
-            <rect x="1" y="8" width="5" height="5" rx="1.2" fill="white" opacity=".7"/>
-            <rect x="8" y="8" width="5" height="5" rx="1.2" fill="white" opacity=".4"/>
-          </svg>
-        </div>
-        Dashboard Studio
-      </div>
+      <AppLogo size={36} />
 
       <div className="tb-div" />
 

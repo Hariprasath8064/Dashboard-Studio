@@ -2,15 +2,125 @@
    PROPERTIES PANEL  (#props-panel, pp-*, table panel, theme cards, computed cols)
 ═══════════════════════════════════════════════ */
 
-/* ── PROPERTIES PANEL ── */
+/* ── RIGHT PANEL (Data + Properties) ── */
+#right-panel,
 #props-panel {
-  width: 256px;
+  width: 320px;
   flex-shrink: 0;
   background: var(--surface);
   border-left: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.panel-view-tabs {
+  display: flex;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+
+.panel-view-tabs button {
+  flex: 1;
+  height: 40px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  font-size: var(--fs-ui);
+  font-weight: 600;
+  color: var(--text2);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.panel-view-tabs button:hover {
+  color: var(--text);
+}
+
+.panel-view-tabs button.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  background: var(--surface);
+}
+
+.panel-view-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.panel-tab-inner {
+  padding: 12px 14px 16px;
+}
+
+.panel-tab-inner--data {
+  padding-top: 8px;
+}
+
+.fields-list-block {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.pp-widget-type {
+  padding: 0 0 10px;
+}
+
+.panel-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 28px 20px;
+  text-align: center;
+  color: var(--text2);
+}
+
+.panel-empty--sm {
+  padding: 16px;
+  font-size: var(--fs-sm);
+  color: var(--text3);
+  line-height: 1.5;
+}
+
+.panel-empty-icon {
+  color: var(--text3);
+  opacity: 0.45;
+  margin-bottom: 12px;
+}
+
+.panel-empty-title {
+  font-size: var(--fs-heading);
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 8px;
+}
+
+.panel-empty-desc {
+  font-size: var(--fs-sm);
+  color: var(--text3);
+  line-height: 1.5;
+  margin: 0;
+  max-width: 240px;
+}
+
+.bf-query-label-hint {
+  font-size: var(--fs-sm);
+  color: var(--text3);
+  margin-left: auto;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.bf-query-badge--count {
+  background: #e0f2fe;
+  color: #0369a1;
 }
 
 .right-panel { display: contents; }
@@ -23,14 +133,14 @@
   align-items: center;
   padding: 0 14px;
   gap: 8px;
-  font-size: 13px;
+  font-size: var(--fs-heading);
   font-weight: 600;
   color: var(--text);
 }
 
 .pp-badge {
-  font-size: 11px;
-  padding: 2px 8px;
+  font-size: var(--fs-sm);
+  padding: 3px 10px;
   border-radius: 12px;
   background: var(--accent-l);
   color: var(--accent);
@@ -60,11 +170,11 @@
 
 .rp-view-tabs button {
   flex: 1;
-  height: 34px;
+  height: 38px;
   border: none;
   border-radius: 0;
   background: transparent;
-  font-size: 11.5px;
+  font-size: var(--fs-ui);
   font-weight: 500;
   color: var(--text2);
   border-bottom: 2px solid transparent;

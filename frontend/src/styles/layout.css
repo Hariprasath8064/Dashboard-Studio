@@ -24,25 +24,26 @@
   z-index: 100;
 }
 
-.tb-logo {
+.app-logo {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text);
-  white-space: nowrap;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
-.tb-logo-mark {
-  width: 32px;
-  height: 32px;
-  background: var(--accent);
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.app-logo-mark {
   flex-shrink: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 73, 148, 0.25);
+}
+
+.app-logo-title {
+  font-size: var(--fs-heading);
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 .tb-div {
@@ -54,7 +55,7 @@
 }
 
 .tb-filename {
-  font-size: 13px;
+  font-size: var(--fs-ui);
   color: var(--text2);
   padding: 0 8px;
   height: 32px;
@@ -99,12 +100,12 @@
 }
 
 .tab-group .tab {
-  height: 28px;
-  padding: 0 16px;
+  height: 32px;
+  padding: 0 18px;
   border: none;
   border-radius: var(--radius);
   background: transparent;
-  font-size: 12px;
+  font-size: var(--fs-ui);
   font-weight: 500;
   color: var(--text2);
   transition: all .15s;
@@ -123,13 +124,13 @@
 }
 
 .tb-btn {
-  height: 32px;
-  padding: 0 14px;
+  height: 36px;
+  padding: 0 16px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
   color: var(--text);
-  font-size: 12px;
+  font-size: var(--fs-ui);
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -216,13 +217,21 @@
 
 /* ── SIDEBAR ── */
 #sidebar {
-  width: 240px;
+  width: 280px;
   flex-shrink: 0;
   background: var(--surface);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.sidebar-theme-tab {
+  padding: 0 4px 12px;
+}
+
+.sidebar-theme-tab .tp-panel {
+  height: auto;
 }
 
 .sidebar-tabs {
@@ -234,12 +243,14 @@
 
 .sidebar-tabs button {
   flex: 1;
-  height: 30px;
+  min-width: 0;
+  height: 38px;
+  padding: 0 6px;
   border: none;
   border-radius: 0;
   background: transparent;
-  font-size: 11px;
-  font-weight: 500;
+  font-size: var(--fs-sm);
+  font-weight: 600;
   color: var(--text2);
   border-bottom: 2px solid transparent;
   transition: all .15s;
@@ -260,7 +271,7 @@
 }
 
 .section-label {
-  font-size: 11px;
+  font-size: var(--fs-label);
   font-weight: 600;
   letter-spacing: .04em;
   text-transform: uppercase;

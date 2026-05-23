@@ -11,8 +11,14 @@
   --border:    #e2e8f0;
   --border2:   #94a3b8;
   --text:      #1e293b;
+  --text1:     #1e293b;
   --text2:     #64748b;
   --text3:     #94a3b8;
+  --fs-body:   14px;
+  --fs-ui:     14px;
+  --fs-sm:     13px;
+  --fs-label:  13px;
+  --fs-heading: 15px;
   --accent:    #005EB8;
   --accent-h:  #004494;
   --accent-l:  #eff6ff;
@@ -43,14 +49,14 @@ html, body, #root {
 body {
   margin: 0;
   font-family: var(--font);
-  font-size: 13px;
+  font-size: var(--fs-body);
   color: var(--text);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
 }
 
-button { font-family: var(--font); font-size: 13px; cursor: pointer; }
-input, select, textarea { font-family: var(--font); font-size: 12px; outline: none; }
+button { font-family: var(--font); font-size: var(--fs-ui); cursor: pointer; }
+input, select, textarea { font-family: var(--font); font-size: var(--fs-sm); outline: none; }
 
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }

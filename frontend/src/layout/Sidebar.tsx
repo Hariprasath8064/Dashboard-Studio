@@ -1,55 +1,48 @@
 import { useState } from "react"
 import ComponentsPanel from "../sidebar/ComponentsPanel"
-import DatasetPanel from "../sidebar/DatasetPanel"
 import LayersPanel from "../layout/LayersPanel"
+import ThemePanel from "../theme/ThemePanel"
 
-export default function Sidebar(){
+type LeftTab = "components" | "layers" | "theme"
 
- const [tab, setTab] = useState<"components"|"data"|"layers">("components")
+export default function Sidebar() {
+  const [tab, setTab] = useState<LeftTab>("components")
 
- return(
+  return (
+    <div id="sidebar">
+      <div className="sidebar-tabs">
+        <button
+          type="button"
+          className={tab === "components" ? "active" : ""}
+          onClick={() => setTab("components")}
+        >
+          Components
+        </button>
+        <button
+          type="button"
+          className={tab === "layers" ? "active" : ""}
+          onClick={() => setTab("layers")}
+        >
+          Layers
+        </button>
+        <button
+          type="button"
+          className={tab === "theme" ? "active" : ""}
+          onClick={() => setTab("theme")}
+        >
+          Theme
+        </button>
+      </div>
 
-  <div id="sidebar">
-
-   <div className="sidebar-tabs">
-
-    <button
-     className={tab==="components"?"active":""}
-     onClick={()=>setTab("components")}
-     title="Components"
-    >
-     Components
-    </button>
-
-    <button
-     className={tab==="data"?"active":""}
-     onClick={()=>setTab("data")}
-     title="Data"
-    >
-     Data
-    </button>
-
-    <button
-     className={tab==="layers"?"active":""}
-     onClick={()=>setTab("layers")}
-     title="Layers"
-    >
-     Layers
-    </button>
-
-   </div>
-
-   <div className="sidebar-body">
-
-    {tab==="components" && <ComponentsPanel/>}
-
-    {tab==="data" && <DatasetPanel/>}
-
-    {tab==="layers" && <LayersPanel/>}
-
-   </div>
-
-  </div>
-
- )
+      <div className="sidebar-body">
+        {tab === "components" && <ComponentsPanel />}
+        {tab === "layers" && <LayersPanel />}
+        {tab === "theme" && (
+          <div className="sidebar-theme-tab">
+            <ThemePanel />
+          </div>
+        )}
+      </div>
+    </div>
+  )
 }
