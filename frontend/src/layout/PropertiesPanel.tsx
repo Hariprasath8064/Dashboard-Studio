@@ -167,22 +167,6 @@ function BigfixQueryBuilder() {
      </div>
     )}
 
-    <BigfixQueryView
-     title="Query preview (live)"
-     queryConfig={cfg}
-     live={!!cfg.objectType && !!cfg.dimension}
-    />
-
-    {lastExecuted && (
-     <BigfixQueryView
-      title="Last executed query"
-      queryConfig={activeSource?.queryConfig}
-      executedQuery={lastExecuted}
-      rowCount={activeSource?.dataset?.rows.length}
-      fetchedAt={activeSource?.fetchedAt}
-     />
-    )}
-
     <div className="bf-query-section">
      <div className="bf-query-label">Object Type</div>
      <select
@@ -316,6 +300,15 @@ function BigfixQueryBuilder() {
       </>
      )}
     </button>
+
+    {lastExecuted && (
+     <BigfixQueryView
+      executedQuery={lastExecuted}
+      rowCount={activeSource?.dataset?.rows.length}
+      fetchedAt={activeSource?.fetchedAt}
+      compact
+     />
+    )}
 
    </div>
 

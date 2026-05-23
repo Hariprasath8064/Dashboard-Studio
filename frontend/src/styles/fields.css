@@ -333,11 +333,12 @@
 }
 
 .bf-query-view {
-  margin: 12px 0;
+  margin: 14px 0 0;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 8px;
   background: var(--bg2);
   overflow: hidden;
+  width: 100%;
 }
 
 .bf-query-view-head {
@@ -364,41 +365,57 @@
   margin-left: auto;
 }
 
-.bf-query-view-err {
+.bf-query-view-hint {
+  margin: 0;
+  padding: 8px 12px 0;
   font-size: 11px;
-  color: var(--red);
-  padding: 6px 10px;
+  line-height: 1.45;
+  color: var(--text3);
 }
 
 .bf-query-view-code {
-  margin: 0;
-  padding: 10px 12px;
+  margin: 8px 0 0;
+  padding: 14px 14px;
   font-family: var(--mono);
-  font-size: 10px;
-  line-height: 1.55;
-  color: var(--text);
+  font-size: 12px;
+  line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;
-  max-height: 200px;
+  min-height: 280px;
+  max-height: min(480px, 55vh);
   overflow: auto;
-  background: #1e293b;
+  background: #0f172a;
   color: #e2e8f0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
-.bf-query-copy {
-  display: block;
-  width: calc(100% - 16px);
-  margin: 0 8px 8px;
-  height: 26px;
+.bf-query-view--expanded .bf-query-view-code {
+  min-height: min(520px, 65vh);
+  max-height: min(720px, 80vh);
+}
+
+.bf-query-view-actions {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px 12px;
+  flex-wrap: wrap;
+}
+
+.bf-query-action {
+  flex: 1;
+  min-width: 120px;
+  height: 32px;
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: 6px;
   background: var(--surface);
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 500;
   cursor: pointer;
   color: var(--text2);
 }
 
-.bf-query-copy:hover {
+.bf-query-action:hover {
   border-color: var(--accent);
   color: var(--accent);
 }

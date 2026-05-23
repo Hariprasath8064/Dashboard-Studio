@@ -45,21 +45,6 @@ export async function executeStructuredQuery(
   }
 }
 
-export async function previewStructuredQuery(
-  objectType: string,
-  selectedProps: string[],
-  sites: string[] = []
-): Promise<string> {
-  const res = await fetch(`${BASE_URL}/query-preview`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ objectType, selectedProps, filters: [], filterLogic: "AND", sites }),
-  })
-  if (!res.ok) throw new Error(`Preview failed: ${res.statusText}`)
-  const result = await res.json()
-  return result.generatedQuery ?? ""
-}
-
 /** Clean up raw BigFix values (URL-encoded noise, <none>, etc.) */
 export function cleanBigfixValue(val: any): string {
   if (val == null || val === "<none>" || val === "") return "Unknown"

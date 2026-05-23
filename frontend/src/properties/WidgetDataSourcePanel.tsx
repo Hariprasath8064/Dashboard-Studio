@@ -39,8 +39,6 @@ export default function WidgetDataSourcePanel({ widget }: Props) {
       {source ? (
         <>
           <BigfixQueryView
-            title="BigFix relevance"
-            queryConfig={source.queryConfig}
             executedQuery={source.generatedQuery}
             rowCount={source.dataset?.rows.length}
             fetchedAt={source.fetchedAt}

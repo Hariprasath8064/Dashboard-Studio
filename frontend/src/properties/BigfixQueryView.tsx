@@ -1,88 +1,58 @@
-import { useEffect, useState } from "react"
-import type { BigfixQueryConfig } from "../types/bigfixTypes"
-import { previewStructuredQuery } from "../services/bigfixApi"
-import { buildPropsToFetch } from "../utils/bigfixQueryUtils"
+import { useState } from "react"
 
 interface Props {
-  title: string
-  queryConfig?: BigfixQueryConfig
-  executedQuery?: string
-  live?: boolean
+  executedQuery: string
   rowCount?: number
   executionMs?: number
   fetchedAt?: string
+  /** Shown in Fields panel vs widget properties */
+  compact?: boolean
 }
 
 export default function BigfixQueryView({
-  title,
-  queryConfig,
   executedQuery,
-  live = false,
   rowCount,
   executionMs,
   fetchedAt,
+  compact = false,
 }: Props) {
-  const [preview, setPreview] = useState("")
-  const [previewError, setPreviewError] = useState<string | null>(null)
-
-  const displayQuery = executedQuery || preview
-
-  useEffect(() => {
-    if (!live || !queryConfig?.objectType || !queryConfig.dimension) {
-      setPreview("")
-      return
-    }
-    const props = buildPropsToFetch(queryConfig)
-    if (!props.length) return
-
-    let cancelled = false
-    const t = window.setTimeout(async () => {
-      try {
-        const q = await previewStructuredQuery(queryConfig.objectType, props, queryConfig.sites)
-        if (!cancelled) {
-          setPreview(q)
-          setPreviewError(null)
-        }
-      } catch (e: any) {
-        if (!cancelled) {
-          setPreview("")
-          setPreviewError(String(e?.message ?? e))
-        }
-      }
-    }, 400)
-
-    return () => {
-      cancelled = true
-      clearTimeout(t)
-    }
-  }, [live, queryConfig?.objectType, queryConfig?.dimension, queryConfig?.metric, queryConfig?.additionalProps, queryConfig?.sites])
-
-  if (!displayQuery && !previewError && !live) return null
+  const [expanded, setExpanded] = useState(false)
+  const q = executedQuery?.trim()
+  if (!q) return null
 
   return (
-    <div className="bf-query-view">
+    <div className={`bf-query-view${expanded ? " bf-query-view--expanded" : ""}${compact ? " bf-query-view--compact" : ""}`}>
       <div className="bf-query-view-head">
-        <span className="bf-query-view-title">{title}</span>
-        {executedQuery && rowCount != null && (
-          <span className="bf-query-view-meta">{rowCount} rows{executionMs != null ? ` · ${executionMs}ms` : ""}</span>
+        <span className="bf-query-view-title">Query sent to BigFix</span>
+        {rowCount != null && (
+          <span className="bf-query-view-meta">
+            {rowCount} rows{executionMs != null ? ` · ${executionMs}ms` : ""}
+          </span>
         )}
         {fetchedAt && (
           <span className="bf-query-view-meta">{new Date(fetchedAt).toLocaleString()}</span>
         )}
       </div>
-      {previewError && live && (
-        <div className="bf-query-view-err">{previewError}</div>
-      )}
-      <pre className="bf-query-view-code">{displayQuery || (live ? "Configure object type and dimension…" : "")}</pre>
-      {displayQuery && (
+      <p className="bf-query-view-hint">
+        This is the exact relevance expression posted to Web Reports when you clicked Fetch data.
+      </p>
+      <pre className="bf-query-view-code">{q}</pre>
+      <div className="bf-query-view-actions">
         <button
           type="button"
-          className="bf-query-copy"
-          onClick={() => navigator.clipboard.writeText(displayQuery)}
+          className="bf-query-action"
+          onClick={() => navigator.clipboard.writeText(q)}
         >
           Copy query
         </button>
-      )}
+        <button
+          type="button"
+          className="bf-query-action"
+          onClick={() => setExpanded(e => !e)}
+        >
+          {expanded ? "Collapse" : "Expand"}
+        </button>
+      </div>
     </div>
   )
 }
