@@ -18,8 +18,9 @@ import { createClipboardSlice } from "./slices/clipboardSlice"
 import { createHistorySlice }   from "./slices/historySlice"
 import { createCanvasSlice }    from "./slices/canvasSlice"
 import { createBigfixSourceSlice, type BigfixSourceSlice } from "./bigfixSourceSlice"
+import { createBuilderUiSlice, type BuilderUiSlice } from "./slices/builderUiSlice"
 
-interface DashboardStore extends DashboardState, BigfixSourceSlice {
+interface DashboardStore extends DashboardState, BigfixSourceSlice, BuilderUiSlice {
 
   addWidget: (widget: Widget) => void
   updateWidget: (widget: Widget) => void
@@ -85,6 +86,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => {
   const widgetSlice  = widgetSliceFactory(set)
   const canvasSlice  = canvasSliceFactory(set)
   const bigfixSlice  = createBigfixSourceSlice(set, get)
+  const builderUi    = createBuilderUiSlice(set, get)
 
   return {
 
@@ -116,6 +118,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => {
   ...createHistorySlice(set),
   ...canvasSlice,
   ...bigfixSlice,
+  ...builderUi,
 
   addWidget: (widget: Widget) => {
     const state = get()

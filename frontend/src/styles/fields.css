@@ -332,100 +332,21 @@
   border-style: solid;
 }
 
-.bf-query-view {
-  margin: 14px 0 0;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg2);
-  overflow: hidden;
-  width: 100%;
-}
-
-.bf-query-view-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-}
-
-.bf-query-view-title {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text2);
-  text-transform: uppercase;
-  letter-spacing: .04em;
-}
-
-.bf-query-view-meta {
-  font-size: 10px;
-  color: var(--text3);
-  margin-left: auto;
-}
-
-.bf-query-view-hint {
-  margin: 0;
-  padding: 8px 12px 0;
-  font-size: 11px;
-  line-height: 1.45;
-  color: var(--text3);
-}
-
-.bf-query-view-code {
-  margin: 8px 0 0;
-  padding: 14px 14px;
-  font-family: var(--mono);
-  font-size: 12px;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  word-break: break-word;
-  min-height: 280px;
-  max-height: min(480px, 55vh);
-  overflow: auto;
-  background: #0f172a;
-  color: #e2e8f0;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
-
-.bf-query-view--expanded .bf-query-view-code {
-  min-height: min(520px, 65vh);
-  max-height: min(720px, 80vh);
-}
-
-.bf-query-view-actions {
-  display: flex;
-  gap: 8px;
-  padding: 10px 12px 12px;
-  flex-wrap: wrap;
-}
-
-.bf-query-action {
-  flex: 1;
-  min-width: 120px;
-  height: 32px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--surface);
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  color: var(--text2);
-}
-
-.bf-query-action:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
 .bf-widget-use {
   margin-top: 10px;
   padding: 8px 10px;
   background: var(--bg2);
   border-radius: 6px;
   border: 1px solid var(--border);
+}
+
+.bf-widget-use-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
 }
 
 .bf-widget-use-code {

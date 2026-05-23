@@ -12,7 +12,6 @@ import LayoutPanel from "../properties/panels/LayoutPanel"
 import DatasetFields from "../sidebar/DatasetFields"
 import ThemePanel from "../theme/ThemePanel"
 import { runBigfixFetch } from "../utils/bigfixFetch"
-import BigfixQueryView from "../properties/BigfixQueryView"
 import WidgetDataSourcePanel from "../properties/WidgetDataSourcePanel"
 import { datasetApi } from "../services/datasetApi"
 import type { BigfixQueryConfig } from "../types/bigfixTypes"
@@ -52,11 +51,6 @@ function BigfixQueryBuilder() {
  const sources                = useDashboardStore(s => s.bigfixDataSources)
  const activeSourceId         = useDashboardStore(s => s.activeDataSourceId)
  const setActiveDataSourceId  = useDashboardStore(s => s.setActiveDataSourceId)
- const activeSource           = useDashboardStore(s =>
-  s.activeDataSourceId
-    ? s.bigfixDataSources.find(x => x.id === s.activeDataSourceId) ?? null
-    : s.bigfixDataSources[0] ?? null
- )
  const dataset                = useDashboardStore(s =>
   (s.activeDataSourceId
     ? s.bigfixDataSources.find(x => x.id === s.activeDataSourceId)?.dataset
@@ -140,8 +134,6 @@ function BigfixQueryBuilder() {
  }
 
  const canFetch = !fetching && !!cfg.objectType && !!cfg.dimension
-
- const lastExecuted = activeSource?.generatedQuery
 
  return (
   <div className="pp-scroll">
@@ -300,15 +292,6 @@ function BigfixQueryBuilder() {
       </>
      )}
     </button>
-
-    {lastExecuted && (
-     <BigfixQueryView
-      executedQuery={lastExecuted}
-      rowCount={activeSource?.dataset?.rows.length}
-      fetchedAt={activeSource?.fetchedAt}
-      compact
-     />
-    )}
 
    </div>
 

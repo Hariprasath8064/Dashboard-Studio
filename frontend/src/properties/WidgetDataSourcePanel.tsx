@@ -1,7 +1,6 @@
 import { useDashboardStore } from "../store/dashboardStore"
 import type { Widget } from "../types/widgetTypes"
 import { describeWidgetDataUse } from "../utils/bigfixQueryUtils"
-import BigfixQueryView from "./BigfixQueryView"
 
 interface Props {
   widget: Widget
@@ -11,6 +10,7 @@ export default function WidgetDataSourcePanel({ widget }: Props) {
   const bigfixMode           = useDashboardStore(s => s.dashboard.bigfixMode)
   const sources              = useDashboardStore(s => s.bigfixDataSources)
   const setWidgetDataSource  = useDashboardStore(s => s.setWidgetDataSource)
+  const openQueryEditor      = useDashboardStore(s => s.openQueryEditor)
 
   if (!bigfixMode) return null
 
@@ -38,13 +38,19 @@ export default function WidgetDataSourcePanel({ widget }: Props) {
 
       {source ? (
         <>
-          <BigfixQueryView
-            executedQuery={source.generatedQuery}
-            rowCount={source.dataset?.rows.length}
-            fetchedAt={source.fetchedAt}
-          />
+          {source.generatedQuery?.trim() ? (
+            <button
+              type="button"
+              className="pp-link-btn"
+              onClick={() => openQueryEditor(source.id)}
+            >
+              View BigFix query in Query tab →
+            </button>
+          ) : (
+            <div className="pp-empty-sm">No query stored for this fetch yet.</div>
+          )}
           <div className="bf-widget-use">
-            <div className="bf-query-view-title" style={{ marginBottom: 4 }}>This widget</div>
+            <div className="bf-widget-use-title">This widget</div>
             <code className="bf-widget-use-code">{describeWidgetDataUse(widget)}</code>
           </div>
         </>

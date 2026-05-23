@@ -4,14 +4,19 @@ import { useDashboardStore } from "../store/dashboardStore"
 import { dashboardApi } from "../services/dashboardApi"
 import DashboardGallery from "../pages/DashboardGallery"
 
+import type { BuilderView } from "../store/slices/builderUiSlice"
+
 interface Props {
-  view: "design" | "preview" | "code"
-  setView: (v: "design" | "preview" | "code") => void
+  view: BuilderView
+  setView: (v: BuilderView) => void
 }
 
 export default function Topbar({ view, setView }: Props) {
 
   const dashboard               = useDashboardStore((s) => s.dashboard)
+  const openQueryEditor         = useDashboardStore((s) => s.openQueryEditor)
+  const bigfixMode              = dashboard.bigfixMode
+  const hasBigfixQueries        = useDashboardStore((s) => s.bigfixDataSources.some(x => x.generatedQuery?.trim()))
   const renameDashboard         = useDashboardStore((s) => s.renameDashboard)
   const resetDashboard          = useDashboardStore((s) => s.resetDashboard)
   const savedDashboardId        = useDashboardStore((s) => s.savedDashboardId)
@@ -177,6 +182,15 @@ export default function Topbar({ view, setView }: Props) {
         >
           Code
         </button>
+        {bigfixMode && (
+          <button
+            className={`tab${view === "query" ? " active" : ""}`}
+            onClick={() => openQueryEditor()}
+            title={hasBigfixQueries ? "View BigFix relevance queries" : "Fetch data first to see queries"}
+          >
+            Query
+          </button>
+        )}
       </div>
 
       <div className="tb-div" />

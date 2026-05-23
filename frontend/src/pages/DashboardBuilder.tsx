@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 
 import Topbar         from "../layout/Topbar"
 import Sidebar        from "../layout/Sidebar"
@@ -9,6 +9,7 @@ import DrillDownModal from "../widgets/DrillDown/DrillDownModal"
 
 import CodePreview from "./CodePreview"
 import PreviewPage from "./PreviewPage"
+import BigfixQueryPage from "./BigfixQueryPage"
 
 import { useDashboardStore } from "../store/dashboardStore"
 import { buildHTML }         from "../generator/HTMLGenerator.ts"
@@ -26,7 +27,8 @@ export default function DashboardBuilder(){
  const deleteSelected   = useDashboardStore(s => s.deleteSelected)
  const setSelection     = useDashboardStore(s => s.setSelection)
 
- const [view, setView] = useState<"design"|"preview"|"code">("design")
+ const view    = useDashboardStore(s => s.builderView)
+ const setView = useDashboardStore(s => s.setBuilderView)
 
  useEffect(() => {
   function onKeyDown(e: KeyboardEvent) {
@@ -93,6 +95,8 @@ export default function DashboardBuilder(){
      <CodePreview code={htmlCode}/>
     </div>
    )}
+
+   {view==="query" && <BigfixQueryPage />}
 
    {view==="design" && <TrashZone/>}
 
