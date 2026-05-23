@@ -5,25 +5,24 @@
 /* ── RIGHT PANEL (Data + Properties) ── */
 #right-panel,
 #props-panel {
-  width: 320px;
-  flex-shrink: 0;
-  background: var(--surface);
-  border-left: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  /* width / borders from .collapsible-panel */
 }
 
 .panel-view-tabs {
   display: flex;
   flex-shrink: 0;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface2);
+  align-items: stretch;
+  justify-content: space-evenly;
+  padding: 0 4px;
 }
 
 .panel-view-tabs button {
-  flex: 1;
+  flex: 0 1 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   height: 40px;
+  padding: 0 10px;
   border: none;
   border-radius: 0;
   background: transparent;
@@ -33,6 +32,7 @@
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
   cursor: pointer;
+  white-space: nowrap;
   transition: color 0.15s, border-color 0.15s;
 }
 

@@ -1,4 +1,5 @@
 ﻿import { useState } from "react"
+import CollapsiblePanel, { PanelCollapseButton } from "../components/CollapsiblePanel"
 import { useDashboardStore } from "../store/dashboardStore"
 
 import ChartProperties from "../properties/ChartProperties"
@@ -43,6 +44,8 @@ export default function PropertiesPanel() {
   const widgets    = useDashboardStore(s => s.dashboard.widgets)
   const selectedId = useDashboardStore(s => s.selectedWidgetId)
   const widget     = widgets.find(w => w.id === selectedId)
+  const collapsed  = useDashboardStore(s => s.rightPanelCollapsed)
+  const toggle     = useDashboardStore(s => s.toggleRightPanel)
 
   const [tab, setTab] = useState<RightTab>("data")
 
@@ -66,17 +69,31 @@ export default function PropertiesPanel() {
   }
 
   return (
-    <div id="right-panel">
-      <div className="panel-view-tabs">
-        <button type="button" className={tab === "data" ? "active" : ""} onClick={() => setTab("data")}>
-          Data
-        </button>
-        <button type="button" className={tab === "fields" ? "active" : ""} onClick={() => setTab("fields")}>
-          Fields
-        </button>
-        <button type="button" className={tab === "properties" ? "active" : ""} onClick={() => setTab("properties")}>
-          Properties
-        </button>
+    <CollapsiblePanel
+      id="right-panel"
+      side="right"
+      collapsed={collapsed}
+      onToggle={toggle}
+      label="Data and properties panel"
+    >
+      <div className="panel-tab-bar panel-tab-bar--right">
+        <PanelCollapseButton
+          side="right"
+          collapsed={false}
+          onToggle={toggle}
+          label="Data and properties panel"
+        />
+        <div className="panel-view-tabs">
+          <button type="button" className={tab === "data" ? "active" : ""} onClick={() => setTab("data")}>
+            Data
+          </button>
+          <button type="button" className={tab === "fields" ? "active" : ""} onClick={() => setTab("fields")}>
+            Fields
+          </button>
+          <button type="button" className={tab === "properties" ? "active" : ""} onClick={() => setTab("properties")}>
+            Properties
+          </button>
+        </div>
       </div>
 
       <div className="panel-view-body">
@@ -107,6 +124,6 @@ export default function PropertiesPanel() {
           )
         )}
       </div>
-    </div>
+    </CollapsiblePanel>
   )
 }
