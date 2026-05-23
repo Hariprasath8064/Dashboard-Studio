@@ -1,124 +1,131 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
+import SyntaxEditor from "../components/SyntaxEditor"
 import { useDashboardStore } from "../store/dashboardStore"
 
+const NEW_SOURCE = "__new__"
+
 export default function BigfixQueryPage() {
-  const bigfixMode             = useDashboardStore(s => s.dashboard.bigfixMode)
-  const sources                = useDashboardStore(s => s.bigfixDataSources)
-  const activeDataSourceId     = useDashboardStore(s => s.activeDataSourceId)
-  const queryEditorSourceId    = useDashboardStore(s => s.queryEditorSourceId)
+  const bigfixMode          = useDashboardStore(s => s.dashboard.bigfixMode)
+  const sources             = useDashboardStore(s => s.bigfixDataSources)
+  const queryEditorSourceId = useDashboardStore(s => s.queryEditorSourceId)
   const setQueryEditorSourceId = useDashboardStore(s => s.setQueryEditorSourceId)
+  const runQueryOnSource    = useDashboardStore(s => s.runQueryOnSource)
 
-  const selectedId = queryEditorSourceId ?? activeDataSourceId ?? sources[0]?.id ?? ""
-  const source     = sources.find(s => s.id === selectedId)
+  const [draft, setDraft]       = useState("")
+  const [running, setRunning]   = useState(false)
+  const [runError, setRunError] = useState<string | null>(null)
+  const [copied, setCopied]     = useState(false)
+  const [pickId, setPickId]     = useState(
+    queryEditorSourceId ?? sources[0]?.id ?? NEW_SOURCE,
+  )
 
-  const [draft, setDraft] = useState("")
-  const [copied, setCopied] = useState(false)
-
-  const queryText = source?.generatedQuery?.trim() ?? ""
+  const source = pickId !== NEW_SOURCE ? sources.find(s => s.id === pickId) : undefined
 
   useEffect(() => {
-    setDraft(queryText)
-  }, [queryText, selectedId])
+    if (queryEditorSourceId) setPickId(queryEditorSourceId)
+  }, [queryEditorSourceId])
 
-  const lineCount = useMemo(() => {
-    if (!draft) return 0
-    return draft.split("\n").length
-  }, [draft])
+  useEffect(() => {
+    if (pickId === NEW_SOURCE) return
+    const q = source?.generatedQuery ?? ""
+    setDraft(q)
+    setRunError(null)
+  }, [pickId, source?.generatedQuery])
+
+  async function handleRun() {
+    const q = draft.trim()
+    if (!q) {
+      setRunError("Enter a relevance query.")
+      return
+    }
+    setRunning(true)
+    setRunError(null)
+    try {
+      const targetId = pickId === NEW_SOURCE ? null : pickId
+      const newId = await runQueryOnSource(targetId, q)
+      setPickId(newId)
+      setQueryEditorSourceId(newId)
+    } catch (err: unknown) {
+      setRunError(String((err as Error)?.message ?? err))
+    } finally {
+      setRunning(false)
+    }
+  }
 
   async function handleCopy() {
-    if (!draft) return
+    if (!draft.trim()) return
     try {
       await navigator.clipboard.writeText(draft)
       setCopied(true)
       setTimeout(() => setCopied(false), 1200)
-    } catch {
-      /* ignore */
-    }
+    } catch { /* ignore */ }
   }
 
   if (!bigfixMode) {
     return (
       <div className="code-view">
         <div className="query-editor query-editor--empty">
-          <p>BigFix mode is not enabled for this dashboard.</p>
+          <p>BigFix mode is not enabled.</p>
         </div>
       </div>
     )
   }
+
+  const rowCount = source?.dataset?.rows.length
 
   return (
     <div className="code-view">
       <div className="query-editor">
         <div className="code-preview-toolbar query-editor-toolbar">
           <span>BigFix relevance</span>
-          {sources.length > 0 && (
-            <select
-              className="query-editor-source-select"
-              value={selectedId}
-              onChange={e => setQueryEditorSourceId(e.target.value)}
-            >
-              {sources.map(s => (
-                <option key={s.id} value={s.id}>
-                  {s.name} ({s.dataset?.rows.length ?? 0} rows)
-                </option>
-              ))}
-            </select>
-          )}
+          <select
+            className="query-editor-source-select"
+            value={pickId}
+            onChange={e => {
+              setPickId(e.target.value)
+              if (e.target.value !== NEW_SOURCE) {
+                setQueryEditorSourceId(e.target.value)
+              }
+            }}
+          >
+            <option value={NEW_SOURCE}>+ New query</option>
+            {sources.map(s => (
+              <option key={s.id} value={s.id}>
+                {s.name} ({s.dataset?.rows.length ?? 0} rows)
+              </option>
+            ))}
+          </select>
           <div style={{ flex: 1 }} />
-          {source?.fetchedAt && (
-            <span className="query-editor-meta">
-              Fetched {new Date(source.fetchedAt).toLocaleString()}
-            </span>
+          {rowCount != null && pickId !== NEW_SOURCE && (
+            <span className="query-editor-meta">{rowCount} rows</span>
           )}
           <button
             type="button"
             className={`code-preview-copy${copied ? " copied" : ""}`}
             onClick={handleCopy}
-            disabled={!draft}
+            disabled={!draft.trim()}
           >
-            {copied ? "✓ Copied" : "Copy query"}
+            {copied ? "✓ Copied" : "Copy"}
+          </button>
+          <button
+            type="button"
+            className="code-preview-copy query-run-btn"
+            onClick={handleRun}
+            disabled={running || !draft.trim()}
+          >
+            {running ? "Running…" : "Run query"}
           </button>
         </div>
 
-        {!source || !queryText ? (
-          <div className="query-editor-empty-body">
-            <h2>No query yet</h2>
-            <p>
-              Build a fetch in the <strong>Fields</strong> panel (Design view) and click{" "}
-              <strong>Fetch Data from BigFix</strong>. The exact relevance sent to Web Reports
-              will appear here.
-            </p>
-          </div>
-        ) : (
-          <>
-            <div className="query-editor-notice">
-              <span className="query-editor-notice-badge">Read-only</span>
-              Generated from the Fields panel. Direct edit and run will be added here later.
-            </div>
-            <div className="query-editor-main">
-              <div className="query-editor-gutter" aria-hidden>
-                {draft.split("\n").map((_, i) => (
-                  <span key={i} className="query-editor-line-num">{i + 1}</span>
-                ))}
-              </div>
-              <textarea
-                className="query-editor-textarea"
-                value={draft}
-                onChange={e => setDraft(e.target.value)}
-                readOnly
-                spellCheck={false}
-                aria-label="BigFix relevance query"
-                placeholder="Query will appear after you fetch data from BigFix…"
-              />
-            </div>
-            <div className="query-editor-footer">
-              <span>{lineCount} lines</span>
-              {source.queryConfig?.objectType && (
-                <span>Object: {source.queryConfig.objectType}</span>
-              )}
-            </div>
-          </>
-        )}
+        {runError && <div className="query-editor-error">{runError}</div>}
+
+        <SyntaxEditor
+          value={draft}
+          onChange={setDraft}
+          language="relevance"
+          placeholder="(name of it, id of it) of bes computers"
+          ariaLabel="BigFix relevance query"
+        />
       </div>
     </div>
   )

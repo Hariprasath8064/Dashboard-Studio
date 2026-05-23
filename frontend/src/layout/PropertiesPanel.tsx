@@ -48,9 +48,6 @@ function BigfixQueryBuilder() {
  const savedConfig            = useDashboardStore(s => s.dashboard.bigfixQueryConfig)
  const setBigfixQueryConfig   = useDashboardStore(s => s.setBigfixQueryConfig)
  const addBigfixDataSource    = useDashboardStore(s => s.addBigfixDataSource)
- const sources                = useDashboardStore(s => s.bigfixDataSources)
- const activeSourceId         = useDashboardStore(s => s.activeDataSourceId)
- const setActiveDataSourceId  = useDashboardStore(s => s.setActiveDataSourceId)
  const dataset                = useDashboardStore(s =>
   (s.activeDataSourceId
     ? s.bigfixDataSources.find(x => x.id === s.activeDataSourceId)?.dataset
@@ -139,26 +136,6 @@ function BigfixQueryBuilder() {
   <div className="pp-scroll">
    <div style={{ padding: "10px 14px 0" }}>
 
-    {sources.length > 0 && (
-     <div className="bf-query-section">
-      <div className="bf-query-label">Active data fetch</div>
-      <select
-       className="pp-select"
-       value={activeSourceId ?? ""}
-       onChange={e => setActiveDataSourceId(e.target.value)}
-      >
-       {sources.map(s => (
-        <option key={s.id} value={s.id}>
-         {s.name} ({s.dataset?.rows.length ?? 0} rows)
-        </option>
-       ))}
-      </select>
-      <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 6, lineHeight: 1.45 }}>
-        New widgets use this fetch. Each &quot;Fetch data&quot; creates a new fetch you can assign per widget.
-      </div>
-     </div>
-    )}
-
     <div className="bf-query-section">
      <div className="bf-query-label">Object Type</div>
      <select
@@ -246,11 +223,7 @@ function BigfixQueryBuilder() {
        Sites
        <span style={{ fontSize: 10, color: "var(--text3)", marginLeft: "auto" }}>all if none selected</span>
       </div>
-      {sites.length === 0 ? (
-       <div style={{ fontSize: 11, color: "var(--text3)", padding: "4px 0" }}>
-        Sites will load after first fetch, or select sites from the backend.
-       </div>
-      ) : (
+      {sites.length > 0 && (
        <div className="bf-prop-list">
         {sites.map(site => (
          <label key={site} className="bf-prop-item">

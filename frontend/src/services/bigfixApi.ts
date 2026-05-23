@@ -22,6 +22,27 @@ export interface StructuredQueryResult {
   executionTimeMs?: number
 }
 
+export async function evaluateBigfixQuery(
+  query: string,
+  split = true,
+): Promise<{ data: string[][]; rowCount: number; executionTimeMs?: number }> {
+  const res = await fetch(`${BASE_URL}/evaluate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query, split }),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(err.details || err.error || res.statusText)
+  }
+  const result = await res.json()
+  return {
+    data: result.data as string[][],
+    rowCount: result.rowCount ?? (result.data?.length ?? 0),
+    executionTimeMs: result.executionTimeMs,
+  }
+}
+
 export async function executeStructuredQuery(
   objectType: string,
   selectedProps: string[],

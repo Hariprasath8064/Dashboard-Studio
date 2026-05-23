@@ -28,6 +28,8 @@ export interface BigfixDataSource {
   generatedQuery: string
   fetchedAt: string
   datasetId: string | null
+  /** Fetched via Query tab / evaluate API instead of structured builder */
+  isCustomQuery?: boolean
 }
 
 export const EMPTY_BIGFIX_QUERY: BigfixQueryConfig = {

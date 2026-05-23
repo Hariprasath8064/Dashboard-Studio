@@ -3,6 +3,8 @@ import type { BigfixDataSource, BigfixQueryConfig } from "../types/bigfixTypes"
 import type { Widget } from "../types/widgetTypes"
 import { datasetApi } from "../services/datasetApi"
 import { runBigfixFetch } from "../utils/bigfixFetch"
+import { runCustomBigfixQuery } from "../utils/runCustomBigfixQuery"
+import { EMPTY_BIGFIX_QUERY } from "../types/bigfixTypes"
 import { bigfixSourceLabel } from "../utils/bigfixQueryUtils"
 import type { BigfixSchema } from "../types/bigfixTypes"
 
@@ -14,12 +16,14 @@ export interface BigfixSourceSlice {
 
   setBigfixSourcesFromLoad: (sources: BigfixDataSource[], datasets: Record<string, Dataset>) => void
   addBigfixDataSource: (params: {
-    queryConfig: BigfixQueryConfig
+    queryConfig?: BigfixQueryConfig
     dataset: Dataset
     generatedQuery: string
     datasetId?: string | null
     name?: string
+    isCustomQuery?: boolean
   }) => string
+  runQueryOnSource: (sourceId: string | null, query: string) => Promise<string>
   updateBigfixSourceDataset: (id: string, dataset: Dataset, generatedQuery: string, datasetId?: string | null) => void
   setActiveDataSourceId: (id: string | null) => void
   setWidgetDataSource: (widgetId: string, sourceId: string) => void
@@ -56,17 +60,19 @@ export function createBigfixSourceSlice(set: any, get: any): BigfixSourceSlice {
       }))
     },
 
-    addBigfixDataSource({ queryConfig, dataset, generatedQuery, datasetId = null, name }) {
+    addBigfixDataSource({ queryConfig, dataset, generatedQuery, datasetId = null, name, isCustomQuery = false }) {
       const id = crypto.randomUUID()
       const fetchedAt = new Date().toISOString()
+      const cfg = queryConfig ?? EMPTY_BIGFIX_QUERY
       const source: BigfixSourceRuntime = {
         id,
-        name: name ?? bigfixSourceLabel(queryConfig.objectType),
-        queryConfig,
+        name: name ?? (isCustomQuery ? "Custom query" : bigfixSourceLabel(cfg.objectType)),
+        queryConfig: cfg,
         generatedQuery,
         fetchedAt,
         datasetId,
         dataset,
+        isCustomQuery,
       }
       const persisted: BigfixDataSource = {
         id: source.id,
@@ -75,6 +81,7 @@ export function createBigfixSourceSlice(set: any, get: any): BigfixSourceSlice {
         generatedQuery: source.generatedQuery,
         fetchedAt: source.fetchedAt,
         datasetId: source.datasetId,
+        isCustomQuery,
       }
       set((state: any) => ({
         bigfixDataSources: [...state.bigfixDataSources, source],
@@ -83,12 +90,54 @@ export function createBigfixSourceSlice(set: any, get: any): BigfixSourceSlice {
           ...state.dashboard,
           bigfixDataSources: [...(state.dashboard.bigfixDataSources ?? []), persisted],
           activeDataSourceId: id,
-          bigfixQueryConfig: queryConfig,
+          bigfixQueryConfig: isCustomQuery ? state.dashboard.bigfixQueryConfig : cfg,
           dataset,
           bigfixFetchedAt: fetchedAt,
         },
       }))
       return id
+    },
+
+    async runQueryOnSource(sourceId, query) {
+      const { dataset, generatedQuery } = await runCustomBigfixQuery(query)
+      const state = get()
+      const label = `Query (${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })})`
+
+      if (sourceId) {
+        const src = state.bigfixDataSources.find((s: BigfixSourceRuntime) => s.id === sourceId)
+        let datasetId = src?.datasetId ?? null
+        try {
+          const saved = await datasetApi.save(src?.name ?? label, dataset)
+          datasetId = saved.id
+        } catch { /* offline */ }
+        get().updateBigfixSourceDataset(sourceId, dataset, generatedQuery, datasetId)
+        set((s: any) => ({
+          bigfixDataSources: s.bigfixDataSources.map((x: BigfixSourceRuntime) =>
+            x.id === sourceId ? { ...x, isCustomQuery: true } : x
+          ),
+          dashboard: {
+            ...s.dashboard,
+            bigfixDataSources: (s.dashboard.bigfixDataSources ?? []).map((x: BigfixDataSource) =>
+              x.id === sourceId ? { ...x, isCustomQuery: true } : x
+            ),
+          },
+        }))
+        return sourceId
+      }
+
+      let datasetId: string | null = null
+      try {
+        const saved = await datasetApi.save(label, dataset)
+        datasetId = saved.id
+      } catch { /* offline */ }
+
+      return get().addBigfixDataSource({
+        dataset,
+        generatedQuery,
+        datasetId,
+        name: label,
+        isCustomQuery: true,
+      })
     },
 
     updateBigfixSourceDataset(id, dataset, generatedQuery, datasetId) {
@@ -159,9 +208,12 @@ export function createBigfixSourceSlice(set: any, get: any): BigfixSourceSlice {
     async refreshBigfixDataSource(id, schema) {
       const state = get()
       const src = state.bigfixDataSources.find((s: BigfixSourceRuntime) => s.id === id)
-      if (!src?.queryConfig?.objectType || !src.queryConfig.dimension) return
+      if (!src) return
 
-      const { dataset, generatedQuery } = await runBigfixFetch(src.queryConfig, schema)
+      const { dataset, generatedQuery } =
+        src.isCustomQuery || !src.queryConfig?.objectType || !src.queryConfig?.dimension
+          ? await runCustomBigfixQuery(src.generatedQuery)
+          : await runBigfixFetch(src.queryConfig, schema)
       let datasetId = src.datasetId
       try {
         const saved = await datasetApi.save(src.name, dataset)
@@ -174,9 +226,8 @@ export function createBigfixSourceSlice(set: any, get: any): BigfixSourceSlice {
     async refreshAllBigfixDataSources(schema) {
       const state = get()
       for (const src of state.bigfixDataSources) {
-        if (src.queryConfig?.objectType && src.queryConfig?.dimension) {
-          await get().refreshBigfixDataSource(src.id, schema)
-        }
+        if (!src.generatedQuery?.trim()) continue
+        await get().refreshBigfixDataSource(src.id, schema)
       }
     },
 
@@ -198,6 +249,7 @@ export function createBigfixSourceSlice(set: any, get: any): BigfixSourceSlice {
           generatedQuery: src.generatedQuery,
           fetchedAt: src.fetchedAt,
           datasetId,
+          isCustomQuery: src.isCustomQuery,
         })
       }
       set((s: any) => ({
