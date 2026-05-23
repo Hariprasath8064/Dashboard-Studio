@@ -26,18 +26,25 @@ function buildThemeStyleBlock(theme: ThemeConfig, canvasBg: string): string {
   `.kpi-label-txt{color:${theme.textSecondary};}`
 }
 
-export function buildHTML(dashboard: any) {
+type SourceRuntime = { id: string; dataset: { columns: any[]; rows: any[][] } | null }
 
-  // Resolve active theme — fall back to DEFAULT_THEME so exports always look correct
+function datasetForWidget(dashboard: any, sources: SourceRuntime[] | undefined, widget: any) {
+  if (!dashboard?.bigfixMode) return dashboard?.dataset ?? null
+  const id = widget?.dataSourceId ?? dashboard?.activeDataSourceId
+  if (id && sources?.length) {
+    const src = sources.find(s => s.id === id)
+    if (src?.dataset) return src.dataset
+  }
+  return dashboard?.dataset ?? null
+}
+
+export function buildHTML(dashboard: any, sources?: SourceRuntime[]) {
+
   const theme: ThemeConfig  = dashboard.theme ?? DEFAULT_THEME
   const canvasBg: string    = dashboard.background?.color ?? theme.dashboardBg
 
-  // Point the generator palette at the theme colours before building chart scripts
   setGeneratorPalette(theme.chartPalette)
 
-  const dataset        = dashboard?.dataset ?? null
-  const datasetColumns = Array.isArray(dataset?.columns) ? dataset.columns : []
-  const datasetRows    = Array.isArray(dataset?.rows)    ? dataset.rows    : []
   const widgets        = Array.isArray(dashboard?.widgets) ? dashboard.widgets : []
   const canvasWidth    = dashboard?.canvas?.width ?? 1200
   const canvasHeight   = Math.max(
@@ -46,11 +53,16 @@ export function buildHTML(dashboard: any) {
   )
 
   const widgetsHTML = widgets
-    .map((w: any) => renderWidgetHTML(w, datasetColumns, datasetRows))
+    .map((w: any) => {
+      const ds = datasetForWidget(dashboard, sources, w)
+      const cols = Array.isArray(ds?.columns) ? ds.columns : []
+      const rows = Array.isArray(ds?.rows) ? ds.rows : []
+      return renderWidgetHTML(w, cols, rows)
+    })
     .join("")
 
   const chartBlocks = widgets
-    .map((w: any) => buildChartScript(w, dashboard?.dataset ?? null))
+    .map((w: any) => buildChartScript(w, datasetForWidget(dashboard, sources, w)))
     .filter(Boolean)
 
   const chartsSection = chartBlocks.length
@@ -83,8 +95,12 @@ ${chartBlocks.join("\n")}
   resetGeneratorPalette()
 
   const hasDrillDown = widgets.some((w: any) => w.drillDown?.enabled)
+  const primaryDs    = dashboard?.dataset ?? sources?.[0]?.dataset ?? null
   const ddScript     = hasDrillDown
-    ? buildDrillDownScript(datasetColumns, datasetRows)
+    ? buildDrillDownScript(
+        Array.isArray(primaryDs?.columns) ? primaryDs.columns : [],
+        Array.isArray(primaryDs?.rows) ? primaryDs.rows : [],
+      )
     : ""
 
   return `

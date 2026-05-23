@@ -1,5 +1,6 @@
 import type { KPIWidget } from "../types/widgetTypes"
 import { useDashboardStore } from "../store/dashboardStore"
+import { useWidgetDataset } from "../hooks/useWidgetDataset"
 import DrillDownProperties from "./DrillDownProperties"
 
 const AGGREGATIONS  = ["SUM", "AVG", "COUNT", "MIN", "MAX"]
@@ -15,7 +16,7 @@ interface Props { widget: KPIWidget }
 
 export default function KPIProperties({ widget }: Props) {
 
-  const dataset      = useDashboardStore(s => s.dashboard.dataset)
+  const dataset      = useWidgetDataset(widget)
   const updateWidget = useDashboardStore(s => s.updateWidget)
 
   const upd = (patch: Partial<KPIWidget>) => updateWidget({ ...widget, ...patch })
@@ -228,6 +229,7 @@ export default function KPIProperties({ widget }: Props) {
       )}
 
       <DrillDownProperties
+        widget={widget}
         drillDown={widget.drillDown}
         onChange={cfg => upd({ drillDown: cfg })}
       />

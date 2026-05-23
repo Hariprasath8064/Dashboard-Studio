@@ -5,7 +5,14 @@ import { useDashboardStore } from "../../store/dashboardStore"
 export default function DrillDownModal() {
 
   const drillDown     = useDashboardStore(s => s.drillDown)
-  const dataset       = useDashboardStore(s => s.dashboard.dataset)
+  const dataset       = useDashboardStore(s => {
+    const id = s.drillDown?.dataSourceId
+    if (id) {
+      const src = s.bigfixDataSources.find(x => x.id === id)
+      if (src?.dataset) return src.dataset
+    }
+    return s.dashboard.dataset
+  })
   const closeDrillDown = useDashboardStore(s => s.closeDrillDown)
   const [search, setSearch] = useState("")
 

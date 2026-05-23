@@ -59,7 +59,8 @@ export default function DashboardBuilder(){
   return () => document.removeEventListener("keydown", onKeyDown)
  }, [undo, redo, copySelected, pasteWidgets, duplicateSelected, deleteSelected, setSelection])
 
- const htmlCode = buildHTML(dashboard)
+ const bigfixSources = useDashboardStore(s => s.bigfixDataSources)
+ const htmlCode = buildHTML(dashboard, bigfixSources)
 
  return(
 

@@ -1,6 +1,6 @@
 import type { Dataset } from "./datasetTypes"
 import type { Widget } from "./widgetTypes"
-import type { BigfixQueryConfig } from "./bigfixTypes"
+import type { BigfixQueryConfig, BigfixDataSource } from "./bigfixTypes"
 import type { ThemeConfig } from "../theme/themePresets"
 
 export interface CanvasConfig {
@@ -30,13 +30,17 @@ export interface Dashboard {
   /** When true, data comes from BigFix; when false, from Excel/CSV */
   bigfixMode?: boolean
 
-  /** The global BigFix query configuration — persisted so the query can be re-run */
+  /** Legacy / active builder config — mirrors the active data source query */
   bigfixQueryConfig?: BigfixQueryConfig
 
-  /** Active theme — controls colours, palette, font and border-radius across the canvas */
+  /** All BigFix fetches in this dashboard (each can power different widgets) */
+  bigfixDataSources?: BigfixDataSource[]
+
+  /** Which fetch is selected in the Fields panel for new widgets */
+  activeDataSourceId?: string
+
   theme?: ThemeConfig
 
-  /** ISO timestamp of the last successful BigFix data fetch */
   bigfixFetchedAt?: string
 
 }

@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react"
 import { dashboardApi, type DashboardMeta } from "../services/dashboardApi"
 import { datasetApi } from "../services/datasetApi"
+import { useDashboardStore } from "../store/dashboardStore"
 import type { Dataset } from "../types/datasetTypes"
+import type { BigfixDataSource } from "../types/bigfixTypes"
+import { bigfixSourceLabel } from "../utils/bigfixQueryUtils"
 
 interface Props {
   onClose: () => void
@@ -12,7 +15,16 @@ interface Props {
   setBigfixPendingRefresh: (v: boolean) => void
 }
 
-export default function DashboardGallery({ onClose, onLoad, setDataset, setSavedDashboardId, resetDashboard, setBigfixPendingRefresh }: Props) {
+export default function DashboardGallery({
+  onClose,
+  onLoad,
+  setDataset,
+  setSavedDashboardId,
+  resetDashboard,
+  setBigfixPendingRefresh,
+}: Props) {
+  const setBigfixSourcesFromLoad = useDashboardStore(s => s.setBigfixSourcesFromLoad)
+
   const [items, setItems]     = useState<DashboardMeta[]>([])
   const [loading, setLoading] = useState(true)
   const [opening, setOpening] = useState<string | null>(null)
@@ -29,42 +41,82 @@ export default function DashboardGallery({ onClose, onLoad, setDataset, setSaved
     try {
       const loaded = await dashboardApi.get(meta.id)
       const parsed = JSON.parse(loaded.canvas_json)
+
+      let sources: BigfixDataSource[] = parsed.bigfixDataSources ?? []
+      const datasets: Record<string, Dataset> = {}
+
+      if (sources.length === 0 && parsed.bigfixMode && parsed.bigfixQueryConfig?.objectType) {
+        const legacyId = crypto.randomUUID()
+        let legacyDataset: Dataset | null = null
+        if (loaded.dataset) {
+          try { legacyDataset = JSON.parse(loaded.dataset) } catch { /* ignore */ }
+        } else if (loaded.dataset_id) {
+          try {
+            const row = await datasetApi.get(loaded.dataset_id)
+            legacyDataset = JSON.parse(row.data)
+          } catch { /* ignore */ }
+        }
+        sources = [{
+          id: legacyId,
+          name: bigfixSourceLabel(parsed.bigfixQueryConfig.objectType),
+          queryConfig: parsed.bigfixQueryConfig,
+          generatedQuery: "",
+          fetchedAt: parsed.bigfixFetchedAt ?? new Date().toISOString(),
+          datasetId: loaded.dataset_id ?? null,
+        }]
+        if (legacyDataset) datasets[legacyId] = legacyDataset
+      }
+
+      for (const src of sources) {
+        if (src.datasetId && !datasets[src.id]) {
+          try {
+            const row = await datasetApi.get(src.datasetId)
+            datasets[src.id] = JSON.parse(row.data)
+          } catch { /* ignore */ }
+        }
+      }
+
+      const defaultSourceId = parsed.activeDataSourceId ?? sources[0]?.id
+      const widgets = (parsed.widgets ?? []).map((w: any) => ({
+        ...w,
+        dataSourceId: w.dataSourceId ?? defaultSourceId,
+      }))
+
       resetDashboard({
         id:                meta.id,
         name:              meta.name,
         canvas:            parsed.canvas            ?? { width: 1200, height: 720 },
         background:        parsed.background        ?? { color: "#f4f6f9" },
-        widgets:           parsed.widgets           ?? [],
+        widgets,
         theme:             parsed.theme,
         dataset:           null,
         bigfixMode:        parsed.bigfixMode        ?? false,
         bigfixQueryConfig: parsed.bigfixQueryConfig ?? undefined,
+        bigfixDataSources: sources,
+        activeDataSourceId: defaultSourceId,
         bigfixFetchedAt:   parsed.bigfixFetchedAt   ?? undefined,
       })
       setSavedDashboardId(meta.id)
 
-      // Rehydrate snapshot dataset (Excel or BigFix) from the linked dataset record
-      const datasetLabel = meta.dataset_name
-        ?? (parsed.bigfixMode && parsed.bigfixQueryConfig?.objectType
-          ? `BigFix: ${parsed.bigfixQueryConfig.objectType}`
-          : "dataset")
-
-      if (loaded.dataset_id && loaded.dataset) {
-        try {
-          const ds: Dataset = JSON.parse(loaded.dataset)
-          setDataset(ds, datasetLabel, loaded.dataset_id)
-        } catch { /* ignore parse failure */ }
-      } else if (loaded.dataset_id) {
-        try {
-          const row = await datasetApi.get(loaded.dataset_id)
-          const ds: Dataset = JSON.parse(row.data)
-          setDataset(ds, datasetLabel, loaded.dataset_id)
-        } catch { /* ignore */ }
-      }
-
-      // If this is a BigFix dashboard, queue a background refresh once schema loads
-      if (parsed.bigfixMode && parsed.bigfixQueryConfig?.objectType && parsed.bigfixQueryConfig?.dimension) {
-        setBigfixPendingRefresh(true)
+      if (parsed.bigfixMode && sources.length > 0) {
+        setBigfixSourcesFromLoad(sources, datasets)
+        if (sources.some(s => s.queryConfig?.objectType && s.queryConfig?.dimension)) {
+          setBigfixPendingRefresh(true)
+        }
+      } else {
+        const datasetLabel = meta.dataset_name ?? "dataset"
+        if (loaded.dataset_id && loaded.dataset) {
+          try {
+            const ds: Dataset = JSON.parse(loaded.dataset)
+            setDataset(ds, datasetLabel, loaded.dataset_id)
+          } catch { /* ignore */ }
+        } else if (loaded.dataset_id) {
+          try {
+            const row = await datasetApi.get(loaded.dataset_id)
+            const ds: Dataset = JSON.parse(row.data)
+            setDataset(ds, datasetLabel, loaded.dataset_id)
+          } catch { /* ignore */ }
+        }
       }
 
       onLoad(meta.id)

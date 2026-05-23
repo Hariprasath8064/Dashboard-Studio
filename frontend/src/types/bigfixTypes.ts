@@ -20,6 +20,16 @@ export interface BigfixQueryConfig {
   sites: string[]
 }
 
+/** One BigFix fetch in the session — widgets bind to a source via dataSourceId */
+export interface BigfixDataSource {
+  id: string
+  name: string
+  queryConfig: BigfixQueryConfig
+  generatedQuery: string
+  fetchedAt: string
+  datasetId: string | null
+}
+
 export const EMPTY_BIGFIX_QUERY: BigfixQueryConfig = {
   objectType: '',
   dimension: '',

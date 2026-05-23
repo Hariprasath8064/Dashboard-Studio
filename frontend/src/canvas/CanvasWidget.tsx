@@ -3,6 +3,7 @@ import { useDashboardStore } from "../store/dashboardStore"
 import type { Widget } from "../types/widgetTypes"
 import ResizeHandles from "./ResizeHandles"
 import { useWidgetDrag } from "../hooks/useWidgetDrag"
+import { WidgetDatasetProvider } from "../hooks/useWidgetDataset"
 import { isDrillDownEnabled } from "../utils/drillDownHelpers"
 
 import BarChartWidget  from "../widgets/BarChart/BarChartWidget"
@@ -40,6 +41,7 @@ export default function CanvasWidget({ widget }: Props) {
 
   const { ghostPos, startDrag } = useWidgetDrag(widget)
   const drillEnabled = isDrillDownEnabled(widget)
+  const widgetDataset = useDashboardStore(s => s.getDatasetForWidget(widget))
 
   function onDrop(e: React.DragEvent) {
     e.stopPropagation()  // prevent canvas from also creating a new widget
@@ -124,7 +126,9 @@ export default function CanvasWidget({ widget }: Props) {
         />
 
         <div className="widget-inner">
-          {renderWidget(widget)}
+          <WidgetDatasetProvider value={widgetDataset}>
+            {renderWidget(widget)}
+          </WidgetDatasetProvider>
         </div>
 
         {selected && selectedWidgetIds.length === 1 && <ResizeHandles widget={widget} />}

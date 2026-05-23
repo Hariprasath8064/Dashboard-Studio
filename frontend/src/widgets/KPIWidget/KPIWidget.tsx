@@ -1,4 +1,4 @@
-import { useDashboardStore } from "../../store/dashboardStore"
+import { useWidgetDataset } from "../../hooks/useWidgetDataset"
 import type { KPIWidget as KPIType } from "../../types/widgetTypes"
 import { buildKpiDrillDownClick } from "../../utils/drillDownHelpers"
 
@@ -61,7 +61,7 @@ function getColumnValues(
 
 export default function KPIWidget({ widget }: Props) {
 
-  const dataset = useDashboardStore(s => s.dashboard.dataset)
+  const dataset = useWidgetDataset(widget)
 
   if (!dataset) {
     return (

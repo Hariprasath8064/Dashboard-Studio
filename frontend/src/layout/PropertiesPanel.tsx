@@ -11,7 +11,9 @@ import StylePanel  from "../properties/panels/StylePanel"
 import LayoutPanel from "../properties/panels/LayoutPanel"
 import DatasetFields from "../sidebar/DatasetFields"
 import ThemePanel from "../theme/ThemePanel"
-import { executeStructuredQuery, bigfixRawToDataset } from "../services/bigfixApi"
+import { runBigfixFetch } from "../utils/bigfixFetch"
+import BigfixQueryView from "../properties/BigfixQueryView"
+import WidgetDataSourcePanel from "../properties/WidgetDataSourcePanel"
 import { datasetApi } from "../services/datasetApi"
 import type { BigfixQueryConfig } from "../types/bigfixTypes"
 import { EMPTY_BIGFIX_QUERY } from "../types/bigfixTypes"
@@ -46,10 +48,20 @@ function BigfixQueryBuilder() {
  const bigfixSchema           = useDashboardStore(s => s.bigfixSchema)
  const savedConfig            = useDashboardStore(s => s.dashboard.bigfixQueryConfig)
  const setBigfixQueryConfig   = useDashboardStore(s => s.setBigfixQueryConfig)
- const setDataset             = useDashboardStore(s => s.setDataset)
- const setSavedDatasetId      = useDashboardStore(s => s.setSavedDatasetId)
- const setBigfixFetchedAt     = useDashboardStore(s => s.setBigfixFetchedAt)
- const dataset                = useDashboardStore(s => s.dashboard.dataset)
+ const addBigfixDataSource    = useDashboardStore(s => s.addBigfixDataSource)
+ const sources                = useDashboardStore(s => s.bigfixDataSources)
+ const activeSourceId         = useDashboardStore(s => s.activeDataSourceId)
+ const setActiveDataSourceId  = useDashboardStore(s => s.setActiveDataSourceId)
+ const activeSource           = useDashboardStore(s =>
+  s.activeDataSourceId
+    ? s.bigfixDataSources.find(x => x.id === s.activeDataSourceId) ?? null
+    : s.bigfixDataSources[0] ?? null
+ )
+ const dataset                = useDashboardStore(s =>
+  (s.activeDataSourceId
+    ? s.bigfixDataSources.find(x => x.id === s.activeDataSourceId)?.dataset
+    : s.bigfixDataSources[0]?.dataset) ?? s.dashboard.dataset
+ )
 
  const [cfg, setCfg]               = useState<BigfixQueryConfig>(savedConfig ?? EMPTY_BIGFIX_QUERY)
  const [sites]                     = useState<string[]>([])
@@ -109,28 +121,17 @@ function BigfixQueryBuilder() {
   setFetching(true)
   setFetchError(null)
   try {
-   const propsToFetch = [cfg.dimension]
-   if (cfg.metric) propsToFetch.push(cfg.metric)
-   cfg.additionalProps.forEach(ap => {
-    if (!propsToFetch.includes(ap)) propsToFetch.push(ap)
-   })
-
-   const rawData = await executeStructuredQuery(cfg.objectType, propsToFetch, cfg.sites)
-   const ds = bigfixRawToDataset(rawData, propsToFetch, cfg.dimension, cfg.metric, cfg.additionalProps, bigfixSchema!, cfg.objectType)
-
+   const { dataset: ds, generatedQuery } = await runBigfixFetch(cfg, bigfixSchema!)
    setBigfixQueryConfig(cfg)
 
-   // Persist snapshot so it can be restored when the dashboard is re-opened
-   const name = `BigFix: ${cfg.objectType}`
    let datasetId: string | null = null
+   const name = `BigFix: ${cfg.objectType} (${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })})`
    try {
     const saved = await datasetApi.save(name, ds)
     datasetId = saved.id
-    setSavedDatasetId(saved.id)
-   } catch { /* backend offline — continue without snapshot */ }
+   } catch { /* backend offline */ }
 
-   setDataset(ds, name, datasetId)
-   setBigfixFetchedAt(new Date().toISOString())
+   addBigfixDataSource({ queryConfig: cfg, dataset: ds, generatedQuery, datasetId, name })
   } catch (err: any) {
    setFetchError(String(err?.message ?? err))
   } finally {
@@ -140,9 +141,47 @@ function BigfixQueryBuilder() {
 
  const canFetch = !fetching && !!cfg.objectType && !!cfg.dimension
 
+ const lastExecuted = activeSource?.generatedQuery
+
  return (
   <div className="pp-scroll">
    <div style={{ padding: "10px 14px 0" }}>
+
+    {sources.length > 0 && (
+     <div className="bf-query-section">
+      <div className="bf-query-label">Active data fetch</div>
+      <select
+       className="pp-select"
+       value={activeSourceId ?? ""}
+       onChange={e => setActiveDataSourceId(e.target.value)}
+      >
+       {sources.map(s => (
+        <option key={s.id} value={s.id}>
+         {s.name} ({s.dataset?.rows.length ?? 0} rows)
+        </option>
+       ))}
+      </select>
+      <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 6, lineHeight: 1.45 }}>
+        New widgets use this fetch. Each &quot;Fetch data&quot; creates a new fetch you can assign per widget.
+      </div>
+     </div>
+    )}
+
+    <BigfixQueryView
+     title="Query preview (live)"
+     queryConfig={cfg}
+     live={!!cfg.objectType && !!cfg.dimension}
+    />
+
+    {lastExecuted && (
+     <BigfixQueryView
+      title="Last executed query"
+      queryConfig={activeSource?.queryConfig}
+      executedQuery={lastExecuted}
+      rowCount={activeSource?.dataset?.rows.length}
+      fetchedAt={activeSource?.fetchedAt}
+     />
+    )}
 
     <div className="bf-query-section">
      <div className="bf-query-label">Object Type</div>
@@ -458,6 +497,7 @@ export default function PropertiesPanel(){
        <span className="pp-badge">{TYPE_LABELS[widget.type] || widget.type}</span>
       </div>
       <div className="pp-scroll">
+       <WidgetDataSourcePanel widget={widget} />
        {renderDataPanel(widget)}
        <StylePanel  widget={widget} />
        <LayoutPanel widget={widget} />

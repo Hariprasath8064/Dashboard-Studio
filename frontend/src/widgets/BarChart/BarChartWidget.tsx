@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react"
 import Chart from "chart.js/auto"
 import type { ChartWidget } from "../../types/widgetTypes"
-import { useDashboardStore } from "../../store/dashboardStore"
+import { useWidgetDataset } from "../../hooks/useWidgetDataset"
 import { runAggregation } from "../../dataset/QueryEngine"
 import { applyFilter, resolveConditionalColors, dataLabelPlugin, buildScalesConfig, multiColorLegendLabels } from "../../utils/chartHelpers"
 import { chartColors } from "../../constants/chartColors"
@@ -14,7 +14,7 @@ interface Props {
 export default function BarChartWidget({ widget }: Props) {
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const dataset = useDashboardStore((s) => s.dashboard.dataset)
+  const dataset = useWidgetDataset(widget)
 
   useEffect(() => {
 

@@ -11,6 +11,7 @@ router.post('/evaluate', relevanceController.evaluateQuery);
 router.post('/wizard-properties', relevanceController.getWizardProperties);
 router.get('/sites', relevanceController.getSites);
 router.post('/query-structured', relevanceController.executeStructuredQuery);
+router.post('/query-preview', relevanceController.previewStructuredQuery);
 router.get('/schema/:objectType', relevanceController.getSchema);
 router.get('/inspectors', inspectorController.getInspectorsSchema);
 

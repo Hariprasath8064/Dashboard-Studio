@@ -55,6 +55,9 @@ export interface WidgetBase {
 
   zIndex: number
 
+  /** BigFix mode: which data fetch this widget uses */
+  dataSourceId?: string
+
 }
 
 export interface ChartWidget extends WidgetBase {

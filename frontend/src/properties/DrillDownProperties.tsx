@@ -1,14 +1,15 @@
-import { useDashboardStore } from "../store/dashboardStore"
-import type { DrillDownConfig } from "../types/widgetTypes"
+import { useWidgetDataset } from "../hooks/useWidgetDataset"
+import type { DrillDownConfig, Widget } from "../types/widgetTypes"
 
 interface Props {
+  widget: Widget
   drillDown: DrillDownConfig | undefined
   onChange: (config: DrillDownConfig) => void
 }
 
-export default function DrillDownProperties({ drillDown, onChange }: Props) {
+export default function DrillDownProperties({ widget, drillDown, onChange }: Props) {
 
-  const dataset  = useDashboardStore(s => s.dashboard.dataset)
+  const dataset  = useWidgetDataset(widget)
   const enabled  = drillDown?.enabled  ?? false
   const dispCols = drillDown?.displayColumns ?? []
 

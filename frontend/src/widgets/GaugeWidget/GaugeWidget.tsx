@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react"
 import Chart from "chart.js/auto"
 import type { ChartWidget } from "../../types/widgetTypes"
-import { useDashboardStore } from "../../store/dashboardStore"
+import { useWidgetDataset } from "../../hooks/useWidgetDataset"
 import { runAggregation } from "../../dataset/QueryEngine"
 
 interface Props { widget: ChartWidget }
@@ -9,7 +9,7 @@ interface Props { widget: ChartWidget }
 export default function GaugeWidget({ widget }: Props) {
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const dataset   = useDashboardStore((s) => s.dashboard.dataset)
+  const dataset   = useWidgetDataset(widget)
 
   useEffect(() => {
 

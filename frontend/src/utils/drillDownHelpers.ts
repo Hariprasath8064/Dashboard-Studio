@@ -11,11 +11,13 @@ export function buildDrillDownClick(
   return (_event, elements) => {
     if (!elements.length) return
     const label = labels[elements[0].index]
+    const st = useDashboardStore.getState()
     useDashboardStore.getState().openDrillDown({
       widgetTitle:    widget.title,
       filterLabel:    label,
       filterColumn:   widget.query.xColumn!,
       displayColumns: widget.drillDown?.displayColumns ?? [],
+      dataSourceId:   widget.dataSourceId ?? st.activeDataSourceId ?? null,
     })
   }
 }
@@ -27,11 +29,13 @@ export function buildKpiDrillDownClick(
   if (!widget.drillDown?.enabled) return undefined
   return (e) => {
     e.stopPropagation()
+    const st = useDashboardStore.getState()
     useDashboardStore.getState().openDrillDown({
       widgetTitle:    widget.label || "KPI",
       filterLabel:    null,
       filterColumn:   null,
       displayColumns: widget.drillDown?.displayColumns ?? [],
+      dataSourceId:   widget.dataSourceId ?? st.activeDataSourceId ?? null,
     })
   }
 }

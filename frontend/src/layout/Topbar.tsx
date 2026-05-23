@@ -19,6 +19,8 @@ export default function Topbar({ view, setView }: Props) {
   const setSavedDashboardId     = useDashboardStore((s) => s.setSavedDashboardId)
   const setDataset              = useDashboardStore((s) => s.setDataset)
   const setBigfixPendingRefresh = useDashboardStore((s) => s.setBigfixPendingRefresh)
+  const persistBigfixSources    = useDashboardStore((s) => s.persistBigfixSources)
+  const bigfixDataSources       = useDashboardStore((s) => s.bigfixDataSources)
 
   const [editing, setEditing]     = useState(false)
   const [nameInput, setNameInput] = useState("")
@@ -80,18 +82,25 @@ export default function Topbar({ view, setView }: Props) {
     setSaving(true)
     setSaveStatus("")
     try {
+      let savedSources = dashboard.bigfixDataSources ?? []
+      if (dashboard.bigfixMode && bigfixDataSources.length > 0) {
+        savedSources = await persistBigfixSources()
+      }
+
       const canvasPayload = {
-        widgets:           dashboard.widgets,
-        canvas:            dashboard.canvas,
-        background:        dashboard.background,
-        theme:             dashboard.theme,
-        bigfixMode:        dashboard.bigfixMode,
-        bigfixQueryConfig: dashboard.bigfixQueryConfig,
-        bigfixFetchedAt:   dashboard.bigfixFetchedAt,
+        widgets:             dashboard.widgets,
+        canvas:              dashboard.canvas,
+        background:          dashboard.background,
+        theme:               dashboard.theme,
+        bigfixMode:          dashboard.bigfixMode,
+        bigfixQueryConfig:   dashboard.bigfixQueryConfig,
+        bigfixDataSources:   savedSources,
+        activeDataSourceId:  dashboard.activeDataSourceId,
+        bigfixFetchedAt:     dashboard.bigfixFetchedAt,
       }
       const payload = {
         name:       dashboard.name,
-        dataset_id: savedDatasetId ?? undefined,
+        dataset_id: savedSources[0]?.datasetId ?? savedDatasetId ?? undefined,
         canvas_json: JSON.stringify(canvasPayload),
       }
       if (savedDashboardId) {

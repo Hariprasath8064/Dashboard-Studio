@@ -219,10 +219,25 @@ const getWizardProperties = async (req, res) => {
   }
 };
 
+const previewStructuredQuery = async (req, res) => {
+  try {
+    const { objectType, selectedProps, filters, filterLogic, sites } = req.body;
+    if (!objectType) return res.status(400).json({ error: 'Missing objectType.' });
+
+    const availableProps = xmlRegistry.getPropertiesFor(objectType);
+    const generatedQuery = generateQuery(objectType, selectedProps, availableProps, filters, filterLogic, sites);
+    res.json({ generatedQuery });
+  } catch (error) {
+    logger.error(`Query preview error: ${error.message}`);
+    res.status(500).json({ error: 'Preview failed', details: error.message });
+  }
+};
+
 module.exports = {
   evaluateQuery,
   getWizardProperties,
   getSites,
   executeStructuredQuery,
+  previewStructuredQuery,
   getSchema
 };

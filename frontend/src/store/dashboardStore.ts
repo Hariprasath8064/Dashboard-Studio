@@ -7,17 +7,19 @@ import type { ThemeConfig } from "../theme/themePresets"
 
 export interface DrillDownPayload {
   widgetTitle: string
-  filterLabel: string | null   // null = show all rows (KPI)
-  filterColumn: string | null  // null = no column filter
-  displayColumns: string[]     // empty = show all dataset columns
+  filterLabel: string | null
+  filterColumn: string | null
+  displayColumns: string[]
+  dataSourceId?: string | null
 }
 import { createWidgetSlice }    from "./slices/widgetSlice"
 import { createSelectionSlice } from "./slices/selectionSlice"
 import { createClipboardSlice } from "./slices/clipboardSlice"
 import { createHistorySlice }   from "./slices/historySlice"
 import { createCanvasSlice }    from "./slices/canvasSlice"
+import { createBigfixSourceSlice, type BigfixSourceSlice } from "./bigfixSourceSlice"
 
-interface DashboardStore extends DashboardState {
+interface DashboardStore extends DashboardState, BigfixSourceSlice {
 
   addWidget: (widget: Widget) => void
   updateWidget: (widget: Widget) => void
@@ -76,7 +78,15 @@ interface DashboardStore extends DashboardState {
 
 }
 
-export const useDashboardStore = create<DashboardStore>((set, get) => ({
+const widgetSliceFactory = createWidgetSlice
+const canvasSliceFactory = createCanvasSlice
+
+export const useDashboardStore = create<DashboardStore>((set, get) => {
+  const widgetSlice  = widgetSliceFactory(set)
+  const canvasSlice  = canvasSliceFactory(set)
+  const bigfixSlice  = createBigfixSourceSlice(set, get)
+
+  return {
 
   dashboard: {
     id: "dashboard-1",
@@ -100,11 +110,34 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
   bigfixPendingRefresh: false,
   drillDown:            null,
 
-  ...createWidgetSlice(set),
+  ...widgetSlice,
   ...createSelectionSlice(set),
   ...createClipboardSlice(set, get),
   ...createHistorySlice(set),
-  ...createCanvasSlice(set),
+  ...canvasSlice,
+  ...bigfixSlice,
+
+  addWidget: (widget: Widget) => {
+    const state = get()
+    const w =
+      state.dashboard.bigfixMode && state.activeDataSourceId && !widget.dataSourceId
+        ? { ...widget, dataSourceId: state.activeDataSourceId }
+        : widget
+    widgetSlice.addWidget(w)
+  },
+
+  resetDashboard: (data) => {
+    set(() => ({
+      dashboard: { ...data, background: data.background || { color: "#f4f6f9" } },
+      selectedWidgetId:  null,
+      selectedWidgetIds: [],
+      clipboard:         [],
+      past:              [],
+      future:            [],
+      bigfixDataSources: [],
+      activeDataSourceId: data.activeDataSourceId ?? null,
+    }))
+  },
 
   setBigfixMode: (mode: boolean) =>
     set((state: any) => ({
@@ -139,4 +172,5 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
   openDrillDown:  (payload) => set(() => ({ drillDown: payload })),
   closeDrillDown: ()        => set(() => ({ drillDown: null })),
 
-}))
+  }
+})

@@ -1,4 +1,4 @@
-import { useDashboardStore } from "../../store/dashboardStore"
+import { useWidgetDataset } from "../../hooks/useWidgetDataset"
 import type { TableWidget as TableType, ComputedColumn } from "../../types/widgetTypes"
 
 function fmt(n: number): string {
@@ -52,7 +52,7 @@ interface Props { widget: TableType }
 
 export default function TableWidget({ widget }: Props) {
 
-  const dataset      = useDashboardStore(s => s.dashboard.dataset)
+  const dataset      = useWidgetDataset(widget)
   const theme        = widget.theme || "default"
   const computedCols = widget.computedColumns || []
 

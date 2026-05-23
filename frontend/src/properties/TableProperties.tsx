@@ -1,6 +1,7 @@
 import { useState } from "react"
 import type { TableWidget, ComputedColumn } from "../types/widgetTypes"
 import { useDashboardStore } from "../store/dashboardStore"
+import { useWidgetDataset } from "../hooks/useWidgetDataset"
 import { generateId } from "../utils/id"
 import ThemePanel           from "./table/ThemePanel"
 import ColumnsPanel         from "./table/ColumnsPanel"
@@ -11,7 +12,7 @@ interface Props { widget: TableWidget }
 
 export default function TableProperties({ widget }: Props) {
 
-  const dataset      = useDashboardStore(s => s.dashboard.dataset)
+  const dataset      = useWidgetDataset(widget)
   const updateWidget = useDashboardStore(s => s.updateWidget)
   const [open, setOpen] = useState("columns")
 

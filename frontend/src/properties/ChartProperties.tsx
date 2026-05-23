@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useDashboardStore } from "../store/dashboardStore"
+import { useWidgetDataset } from "../hooks/useWidgetDataset"
 import type { ChartWidget, ColorRule } from "../types/widgetTypes"
 import { runAggregation } from "../dataset/QueryEngine"
 import { chartColors } from "../constants/chartColors"
@@ -21,7 +22,7 @@ const RULE_OPS = [
 
 export default function ChartProperties({ widget }: Props) {
 
-  const dataset      = useDashboardStore((s) => s.dashboard.dataset)
+  const dataset      = useWidgetDataset(widget)
   const updateWidget = useDashboardStore((s) => s.updateWidget)
   const [rulesOpen, setRulesOpen] = useState(false)
 
@@ -256,6 +257,7 @@ export default function ChartProperties({ widget }: Props) {
       )}
 
       <DrillDownProperties
+        widget={widget}
         drillDown={widget.drillDown}
         onChange={cfg => set("drillDown", cfg)}
       />

@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useDashboardStore } from "../../store/dashboardStore"
+import { useWidgetDataset } from "../../hooks/useWidgetDataset"
 import { runAggregation } from "../../dataset/QueryEngine"
 import AxisOptionsEditor  from "./style/AxisOptionsEditor"
 import PerBarColorEditor  from "./style/PerBarColorEditor"
@@ -19,7 +20,7 @@ const DUAL_Y_TYPES     = ["bar","line","area","stacked-bar"]
 export default function StylePanel({ widget }: any) {
 
   const updateWidget = useDashboardStore(s => s.updateWidget)
-  const dataset      = useDashboardStore(s => s.dashboard.dataset)
+  const dataset      = useWidgetDataset(widget)
   const [axisOpen,   setAxisOpen] = useState(false)
 
   const isPerBarType  = PER_BAR_TYPES.includes(widget.type)

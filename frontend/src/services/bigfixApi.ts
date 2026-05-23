@@ -15,19 +15,49 @@ export async function fetchSites(): Promise<Array<{ name: string; isOperator: bo
   return res.json()
 }
 
+export interface StructuredQueryResult {
+  data: string[][]
+  generatedQuery: string
+  rowCount?: number
+  executionTimeMs?: number
+}
+
 export async function executeStructuredQuery(
   objectType: string,
   selectedProps: string[],
   sites: string[] = []
-): Promise<string[][]> {
+): Promise<StructuredQueryResult> {
   const res = await fetch(`${BASE_URL}/query-structured`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ objectType, selectedProps, filters: [], filterLogic: "AND", sites }),
   })
-  if (!res.ok) throw new Error(`BigFix query failed: ${res.statusText}`)
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(err.details || err.error || res.statusText)
+  }
   const result = await res.json()
-  return result.data as string[][]
+  return {
+    data: result.data as string[][],
+    generatedQuery: result.generatedQuery ?? "",
+    rowCount: result.rowCount,
+    executionTimeMs: result.executionTimeMs,
+  }
+}
+
+export async function previewStructuredQuery(
+  objectType: string,
+  selectedProps: string[],
+  sites: string[] = []
+): Promise<string> {
+  const res = await fetch(`${BASE_URL}/query-preview`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ objectType, selectedProps, filters: [], filterLogic: "AND", sites }),
+  })
+  if (!res.ok) throw new Error(`Preview failed: ${res.statusText}`)
+  const result = await res.json()
+  return result.generatedQuery ?? ""
 }
 
 /** Clean up raw BigFix values (URL-encoded noise, <none>, etc.) */
