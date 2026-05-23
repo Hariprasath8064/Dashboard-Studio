@@ -50,36 +50,57 @@ export function relevanceExprToColumnName(expr: string): string {
   return titleCaseWords(leaf)
 }
 
+/** Extract property path from `exists PATH of it AND exists PATH of it` guards. */
+function namesFromExistsClauses(query: string): string[] {
+  const names: string[] = []
+  const re = /exists\s+(.+?)\s+of\s+it\s+AND\s+exists\s+\1\s+of\s+it/gi
+  for (const m of query.matchAll(re)) {
+    names.push(relevanceExprToColumnName(`${m[1].trim()} of it`))
+  }
+  return names
+}
+
 /** Parse column names from Dashboard Studio / structured $x$ export queries. */
 function namesFromStructuredQuery(query: string): string[] {
   if (!query.includes("item 0 of it") && !query.includes("$x$")) return []
 
   const names: string[] = []
 
-  for (const m of query.matchAll(/concatenation "%0A" of \(\((.+?)\) as string\)/gi)) {
-    let inner = m[1].trim()
-    while (inner.startsWith("(") && inner.endsWith(")")) {
-      inner = inner.slice(1, -1).trim()
-    }
-    if (/ of it\s*$/i.test(inner)) {
-      names.push(relevanceExprToColumnName(inner))
-    }
-  }
-
+  // (concatenation "%0A" of (operating systems of it as string)) — single-paren (common)
   for (const m of query.matchAll(
-    /values of results \(it,\s*bes property whose \(id of it = \d+ AND name of it = "([^"]+)"\)\)/gi,
+    /concatenation\s+"%0A"\s+of\s+\(([^(\n]+?)\s+of\s+it\s+as\s+string\)/gi,
   )) {
-    names.push(m[1])
+    names.push(relevanceExprToColumnName(`${m[1].trim()} of it`))
   }
 
-  for (const m of query.matchAll(/values of results \(it,\s*bes property "([^"]+)"\)/gi)) {
-    names.push(m[1])
+  // (concatenation "%0A" of ((operating systems of it) as string)) — double-paren (relevanceBuilder default)
+  if (names.length === 0) {
+    for (const m of query.matchAll(/concatenation\s+"%0A"\s+of\s+\(\((.+?)\)\s+as\s+string\)/gi)) {
+      let inner = m[1].trim()
+      while (inner.startsWith("(") && inner.endsWith(")")) {
+        inner = inner.slice(1, -1).trim()
+      }
+      if (/ of it\s*$/i.test(inner)) {
+        names.push(relevanceExprToColumnName(inner))
+      }
+    }
   }
 
-  for (const m of query.matchAll(
-    /\(if \(exists \(([^)]+)\)\) then \(concatenation "%0A" of \(\(\1\) as string\)/gi,
-  )) {
-    names.push(relevanceExprToColumnName(m[1]))
+  // Analysis / global properties
+  if (names.length === 0) {
+    for (const m of query.matchAll(
+      /values of results \(it,\s*bes property whose \(id of it = \d+ AND name of it = "([^"]+)"\)\)/gi,
+    )) {
+      names.push(m[1])
+    }
+    for (const m of query.matchAll(/values of results \(it,\s*bes property "([^"]+)"\)/gi)) {
+      names.push(m[1])
+    }
+  }
+
+  // Fallback: read property paths from exists … AND exists … guards in order
+  if (names.length === 0) {
+    return namesFromExistsClauses(query)
   }
 
   return names
@@ -132,8 +153,13 @@ export function inferColumnNamesFromRelevance(query: string, colCount: number): 
   if (structured.length > 0) names = structured
 
   if (names.length !== colCount) {
+    const existsNames = namesFromExistsClauses(query)
+    if (existsNames.length === colCount) names = existsNames
+  }
+
+  if (names.length !== colCount) {
     const tuple = namesFromTupleQuery(query)
-    if (tuple.length > 0) names = tuple
+    if (tuple.length === colCount) names = tuple
   }
 
   if (names.length !== colCount && colCount === 1) {
