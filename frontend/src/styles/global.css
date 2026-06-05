@@ -3,25 +3,36 @@
 :root {
   --font:      'Inter', sans-serif;
   --mono:      'Courier New', monospace;
-  --bg:        #f4f5f7;
-  --bg2:       #eef2f6;
+
+  /* Surfaces — shell, panels, workspace */
+  --bg:        #f8fafc;
+  --bg2:       #eef1f5;
   --surface:   #ffffff;
   --surface2:  #f8fafc;
   --hover:     #f1f5f9;
   --border:    #e2e8f0;
   --border2:   #94a3b8;
+
   --text:      #1e293b;
   --text1:     #1e293b;
   --text2:     #64748b;
   --text3:     #94a3b8;
+
   --fs-body:   14px;
   --fs-ui:     14px;
   --fs-sm:     13px;
   --fs-label:  13px;
   --fs-heading: 15px;
-  --accent:    #005EB8;
-  --accent-h:  #004494;
-  --accent-l:  #eff6ff;
+
+  /* Brand — BigFix-adjacent primary + secondary for charts/actions */
+  --accent:         #005EB8;
+  --accent-h:       #004494;
+  --accent-light:   #0072CE;
+  --accent-l:       #eff6ff;
+  --accent-secondary: #0072CE;
+  --accent-secondary-l: #e0f2fe;
+  --accent-gradient: linear-gradient(135deg, #0072CE 0%, #004494 100%);
+
   --green:     #16a34a;
   --green-l:   #dcfce7;
   --red:       #dc2626;
@@ -30,12 +41,21 @@
   --amber-l:   #fef3c7;
   --purple:    #7c3aed;
   --purple-l:  #f5f3ff;
-  --radius:    4px;
+
+  --radius:    6px;
   --radius-lg: 8px;
-  --shadow:    0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,.07), 0 2px 4px -1px rgba(0,0,0,.04);
-  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05);
-  --canvas-workspace: #e8eaed;
+
+  /* Single elevation tier — modals, dropdowns, popovers only */
+  --shadow-elevated:
+    0 4px 6px -1px rgba(15, 23, 42, 0.08),
+    0 10px 20px -4px rgba(15, 23, 42, 0.12);
+
+  /* Legacy aliases — avoid on small controls */
+  --shadow:    none;
+  --shadow-md: var(--shadow-elevated);
+  --shadow-lg: var(--shadow-elevated);
+
+  --canvas-workspace: #eef1f5;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }

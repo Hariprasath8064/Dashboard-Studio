@@ -42,7 +42,7 @@
 
 .panel-view-tabs button.active {
   color: var(--accent);
-  border-bottom-color: var(--accent);
+  border-bottom-color: var(--accent-light);
   background: var(--surface);
 }
 
@@ -317,7 +317,8 @@
   background: var(--surface);
   color: var(--accent);
   font-weight: 600;
-  box-shadow: var(--shadow);
+  outline: 1px solid var(--border);
+  box-shadow: none;
 }
 
 /* ── Text format buttons ── */

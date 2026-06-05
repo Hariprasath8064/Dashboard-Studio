@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { exportDashboard } from "../export/ExportService"
 import { useDashboardStore } from "../store/dashboardStore"
 import { dashboardApi } from "../services/dashboardApi"
@@ -28,12 +28,27 @@ export default function Topbar({ view, setView }: Props) {
   const persistBigfixSources    = useDashboardStore((s) => s.persistBigfixSources)
   const bigfixDataSources       = useDashboardStore((s) => s.bigfixDataSources)
 
-  const [editing, setEditing]     = useState(false)
-  const [nameInput, setNameInput] = useState("")
-  const [saving, setSaving]       = useState(false)
+  const [editing, setEditing]       = useState(false)
+  const [nameInput, setNameInput]   = useState("")
+  const [saving, setSaving]         = useState(false)
   const [saveStatus, setSaveStatus] = useState<"" | "saved" | "error">("")
   const [showGallery, setShowGallery] = useState(false)
-  const loadRef = useRef<HTMLInputElement>(null)
+  const [fileMenuOpen, setFileMenuOpen] = useState(false)
+  const [loadError, setLoadError]   = useState<string | null>(null)
+
+  const loadRef    = useRef<HTMLInputElement>(null)
+  const fileMenuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!fileMenuOpen) return
+    function onDocClick(e: MouseEvent) {
+      if (fileMenuRef.current && !fileMenuRef.current.contains(e.target as Node)) {
+        setFileMenuOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", onDocClick)
+    return () => document.removeEventListener("mousedown", onDocClick)
+  }, [fileMenuOpen])
 
   function startRename() {
     setNameInput(dashboard.name)
@@ -52,6 +67,7 @@ export default function Topbar({ view, setView }: Props) {
   }
 
   function saveJSON() {
+    setFileMenuOpen(false)
     const json = JSON.stringify(dashboard, null, 2)
     const blob = new Blob([json], { type: "application/json" })
     const url = URL.createObjectURL(blob)
@@ -67,17 +83,19 @@ export default function Topbar({ view, setView }: Props) {
   function handleLoadFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
+    setFileMenuOpen(false)
     const reader = new FileReader()
     reader.onload = (ev) => {
       try {
         const data = JSON.parse(ev.target!.result as string)
         if (data && typeof data === "object" && Array.isArray(data.widgets)) {
           resetDashboard(data)
+          setLoadError(null)
         } else {
-          alert("Invalid dashboard JSON file.")
+          setLoadError("Invalid dashboard JSON file.")
         }
       } catch {
-        alert("Could not parse JSON file.")
+        setLoadError("Could not parse JSON file.")
       }
     }
     reader.readAsText(file)
@@ -85,6 +103,7 @@ export default function Topbar({ view, setView }: Props) {
   }
 
   async function saveToCloud() {
+    setFileMenuOpen(false)
     setSaving(true)
     setSaveStatus("")
     try {
@@ -124,123 +143,179 @@ export default function Topbar({ view, setView }: Props) {
     }
   }
 
+  function openGallery() {
+    setFileMenuOpen(false)
+    setShowGallery(true)
+  }
+
+  function triggerLoad() {
+    setFileMenuOpen(false)
+    loadRef.current?.click()
+  }
+
+  const cloudLabel = saving
+    ? "Saving…"
+    : saveStatus === "saved"
+      ? "Saved!"
+      : saveStatus === "error"
+        ? "Save failed"
+        : savedDashboardId
+          ? "Save to cloud"
+          : "Save to cloud"
+
   return (
 
     <div id="topbar">
 
-      <AppLogo size={36} />
-
-      <div className="tb-div" />
-
-      {editing ? (
-        <input
-          className="tb-rename-input"
-          value={nameInput}
-          onChange={(e) => setNameInput(e.target.value)}
-          onBlur={commitRename}
-          onKeyDown={handleRenameKey}
-          autoFocus
-          maxLength={60}
-        />
-      ) : (
-        <span
-          className="tb-filename"
-          onClick={startRename}
-          title="Click to rename"
-        >
-          {dashboard.name}
-        </span>
-      )}
-
-      <div className="tb-spacer" />
-
-      <div className="tab-group">
-        <button
-          className={`tab${view === "design" ? " active" : ""}`}
-          onClick={() => setView("design")}
-        >
-          Design
-        </button>
-        <button
-          className={`tab${view === "preview" ? " active" : ""}`}
-          onClick={() => setView("preview")}
-        >
-          Preview
-        </button>
-        <button
-          className={`tab${view === "code" ? " active" : ""}`}
-          onClick={() => setView("code")}
-        >
-          Code
-        </button>
-        {bigfixMode && (
-          <button
-            className={`tab${view === "query" ? " active" : ""}`}
-            onClick={() => openQueryEditor()}
-            title={hasBigfixQueries ? "View BigFix relevance queries" : "Fetch data first to see queries"}
-          >
-            Query
-          </button>
-        )}
+      <div className="tb-left">
+        <AppLogo size={32} showWordmark={false} />
+        <div className="tb-breadcrumb">
+          <span className="tb-breadcrumb-app">Dashboard Studio</span>
+          <span className="tb-breadcrumb-sep" aria-hidden>/</span>
+          {editing ? (
+            <input
+              className="tb-rename-input"
+              value={nameInput}
+              onChange={(e) => setNameInput(e.target.value)}
+              onBlur={commitRename}
+              onKeyDown={handleRenameKey}
+              autoFocus
+              maxLength={60}
+              aria-label="Dashboard name"
+            />
+          ) : (
+            <span
+              className="tb-breadcrumb-title"
+              onClick={startRename}
+              title="Click to rename"
+            >
+              {dashboard.name}
+            </span>
+          )}
+        </div>
       </div>
 
-      <div className="tb-div" />
+      <div className="tb-center">
+        <div className="tab-group" role="tablist" aria-label="Builder views">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={view === "design"}
+            className={`tab${view === "design" ? " active" : ""}`}
+            onClick={() => setView("design")}
+          >
+            Design
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={view === "preview"}
+            className={`tab${view === "preview" ? " active" : ""}`}
+            onClick={() => setView("preview")}
+          >
+            Preview
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={view === "code"}
+            className={`tab${view === "code" ? " active" : ""}`}
+            onClick={() => setView("code")}
+          >
+            Code
+          </button>
+          {bigfixMode && (
+            <button
+              type="button"
+              role="tab"
+              aria-selected={view === "query"}
+              className={`tab${view === "query" ? " active" : ""}`}
+              onClick={() => openQueryEditor()}
+              title={hasBigfixQueries ? "View BigFix relevance queries" : "Fetch data first to see queries"}
+            >
+              Query
+            </button>
+          )}
+        </div>
+      </div>
 
-      <button className="tb-btn" onClick={saveJSON}>
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 10h8M6 2v6M3 5l3 3 3-3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
-        Save JSON
-      </button>
-
-      <button className="tb-btn" onClick={() => loadRef.current?.click()}>
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 8v2h8V8M6 2v6M3 5l3-3 3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
-        Load
-      </button>
-
-      <input
-        ref={loadRef}
-        type="file"
-        accept=".json"
-        style={{ display: "none" }}
-        onChange={handleLoadFile}
-      />
-
-      <div className="tb-div" />
-
-      {/* Cloud: open gallery */}
-      <button className="tb-btn" onClick={() => setShowGallery(true)} title="Open saved dashboard">
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 3h10M1 6h7M1 9h5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
-        Open
-      </button>
-
-      {/* Cloud: save to backend */}
-      <button
-        className={`tb-btn${saveStatus === "saved" ? " success" : saveStatus === "error" ? " danger" : ""}`}
-        onClick={saveToCloud}
-        disabled={saving}
-        title={savedDashboardId ? "Update saved dashboard" : "Save dashboard to backend"}
-      >
-        {saving ? (
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeDasharray="40 20" strokeLinecap="round">
-              <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.8s" repeatCount="indefinite"/>
-            </circle>
-          </svg>
-        ) : (
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M9 4H3a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1z" stroke="currentColor" strokeWidth="1.3"/>
-            <path d="M4 1v3M8 1v3M1 7h10" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-          </svg>
+      <div className="tb-right">
+        {loadError && (
+          <span className="tb-save-flash error" title={loadError}>Load failed</span>
         )}
-        {saveStatus === "saved" ? "Saved!" : saveStatus === "error" ? "Failed" : savedDashboardId ? "Update" : "Save"}
-      </button>
+        {saveStatus === "saved" && !fileMenuOpen && (
+          <span className="tb-save-flash">Saved</span>
+        )}
+        {saveStatus === "error" && !fileMenuOpen && (
+          <span className="tb-save-flash error">Save failed</span>
+        )}
 
-      <button
-        className="tb-btn primary"
-        onClick={exportDashboard}
-      >
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 10h8M6 8V2M3 5l3 3 3-3" stroke="white" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
-        Export HTML
-      </button>
+        <div className="tb-file-wrap" ref={fileMenuRef}>
+          <button
+            type="button"
+            className="tb-btn"
+            onClick={() => setFileMenuOpen(o => !o)}
+            aria-expanded={fileMenuOpen}
+            aria-haspopup="menu"
+            title="File actions"
+          >
+            File
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden>
+              <path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+            </svg>
+          </button>
+
+          {fileMenuOpen && (
+            <div className="tb-file-menu" role="menu">
+              <button type="button" className="tb-file-menu-item" role="menuitem" onClick={openGallery}>
+                <svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M1 3h10M1 6h7M1 9h5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
+                Open dashboard…
+              </button>
+              <button
+                type="button"
+                className="tb-file-menu-item"
+                role="menuitem"
+                onClick={saveToCloud}
+                disabled={saving}
+              >
+                <svg width="14" height="14" viewBox="0 0 12 12" fill="none">
+                  <path d="M9 4H3a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1z" stroke="currentColor" strokeWidth="1.3"/>
+                  <path d="M4 1v3M8 1v3M1 7h10" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+                </svg>
+                {cloudLabel}
+              </button>
+              <div className="tb-file-menu-divider" />
+              <div className="tb-file-menu-hint">Local files</div>
+              <button type="button" className="tb-file-menu-item" role="menuitem" onClick={saveJSON}>
+                <svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2 10h8M6 2v6M3 5l3 3 3-3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                Download JSON
+              </button>
+              <button type="button" className="tb-file-menu-item" role="menuitem" onClick={triggerLoad}>
+                <svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2 8v2h8V8M6 2v6M3 5l3-3 3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                Load JSON…
+              </button>
+            </div>
+          )}
+        </div>
+
+        <input
+          ref={loadRef}
+          type="file"
+          accept=".json"
+          style={{ display: "none" }}
+          onChange={handleLoadFile}
+        />
+
+        <button
+          type="button"
+          className="tb-btn primary"
+          onClick={exportDashboard}
+          title="Export dashboard as HTML"
+        >
+          <svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2 10h8M6 8V2M3 5l3 3 3-3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          Export HTML
+        </button>
+      </div>
 
       {showGallery && (
         <DashboardGallery

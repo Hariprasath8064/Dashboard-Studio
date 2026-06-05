@@ -13,15 +13,92 @@
 
 /* ── TOP BAR ── */
 #topbar {
-  height: 60px;
+  height: 56px;
   flex-shrink: 0;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  z-index: 100;
+}
+
+.tb-left {
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  gap: 10px;
+  min-width: 0;
+  justify-self: start;
+}
+
+.tb-center {
+  justify-self: center;
+}
+
+.tb-right {
+  display: flex;
+  align-items: center;
   gap: 8px;
-  z-index: 100;
+  justify-self: end;
+}
+
+.tb-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: var(--fs-sm);
+}
+
+.tb-breadcrumb-app {
+  color: var(--text3);
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tb-breadcrumb-sep {
+  color: var(--border2);
+  font-weight: 400;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.tb-breadcrumb-title {
+  color: var(--text);
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  cursor: text;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.tb-breadcrumb-title:hover {
+  background: var(--hover);
+  border-color: var(--border);
+}
+
+.tb-rename-input {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  font-family: var(--font);
+  color: var(--text1);
+  padding: 4px 8px;
+  height: 30px;
+  border: 1px solid var(--accent-light);
+  border-radius: var(--radius);
+  background: var(--surface);
+  outline: none;
+  min-width: 140px;
+  max-width: 220px;
+  box-shadow: 0 0 0 3px rgba(0, 114, 206, 0.15);
 }
 
 .app-logo {
@@ -33,9 +110,9 @@
 
 .app-logo-mark {
   flex-shrink: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 73, 148, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 73, 148, 0.2);
 }
 
 .app-logo-title {
@@ -54,61 +131,27 @@
   flex-shrink: 0;
 }
 
-.tb-filename {
-  font-size: var(--fs-ui);
-  color: var(--text2);
-  padding: 0 8px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  border: 1px solid transparent;
-  border-radius: var(--radius);
-  cursor: text;
-  font-weight: 500;
-}
-
-.tb-filename:hover {
-  border-color: var(--border);
-  background: var(--surface2);
-}
-
-.tb-rename-input {
-  font-size: 13px;
-  font-weight: 500;
-  font-family: var(--font);
-  color: var(--text1);
-  padding: 0 8px;
-  height: 28px;
-  border: 1px solid var(--accent);
-  border-radius: var(--radius);
-  background: var(--surface);
-  outline: none;
-  min-width: 160px;
-  max-width: 260px;
-  box-shadow: 0 0 0 2px rgba(0,94,184,.15);
-}
-
 .tb-spacer { flex: 1; }
 
 .tab-group {
   display: flex;
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   padding: 3px;
   gap: 2px;
 }
 
 .tab-group .tab {
   height: 32px;
-  padding: 0 18px;
+  padding: 0 16px;
   border: none;
   border-radius: var(--radius);
   background: transparent;
-  font-size: var(--fs-ui);
+  font-size: var(--fs-sm);
   font-weight: 500;
   color: var(--text2);
-  transition: all .15s;
+  transition: color 0.15s, background 0.15s;
 }
 
 .tab-group .tab:hover {
@@ -119,43 +162,129 @@
 .tab-group .tab.active {
   background: var(--surface);
   color: var(--accent);
-  box-shadow: var(--shadow);
   font-weight: 600;
+  box-shadow: none;
+  outline: 1px solid var(--border);
+}
+
+/* File menu */
+.tb-file-wrap {
+  position: relative;
 }
 
 .tb-btn {
-  height: 36px;
-  padding: 0 16px;
+  height: 34px;
+  padding: 0 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
   color: var(--text);
-  font-size: var(--fs-ui);
+  font-size: var(--fs-sm);
   font-weight: 500;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: all .15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
   white-space: nowrap;
 }
 
 .tb-btn:hover {
-  background: var(--bg);
+  background: var(--hover);
   border-color: var(--border2);
 }
 
+.tb-btn.icon-only {
+  width: 34px;
+  padding: 0;
+  justify-content: center;
+}
+
 .tb-btn.primary {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--accent-gradient);
+  border: 1px solid transparent;
   color: #fff;
+  font-weight: 600;
+  padding: 0 16px;
 }
 
 .tb-btn.primary:hover {
-  background: var(--accent-h);
+  filter: brightness(1.06);
+  border-color: transparent;
+}
+
+.tb-btn.primary svg {
+  opacity: 0.95;
 }
 
 .tb-btn.success { background: var(--green-l); border-color: var(--green); color: var(--green); }
 .tb-btn.danger  { background: var(--red-l);   border-color: var(--red);   color: var(--red);  }
+
+.tb-file-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 200px;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-elevated);
+  z-index: 200;
+}
+
+.tb-file-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.tb-file-menu-item:hover:not(:disabled) {
+  background: var(--hover);
+}
+
+.tb-file-menu-item:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.tb-file-menu-item svg {
+  flex-shrink: 0;
+  color: var(--text2);
+}
+
+.tb-file-menu-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 6px;
+}
+
+.tb-file-menu-hint {
+  padding: 6px 10px 4px;
+  font-size: 11px;
+  color: var(--text3);
+}
+
+.tb-save-flash {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--green);
+  white-space: nowrap;
+}
+
+.tb-save-flash.error {
+  color: var(--red);
+}
 
 /* ── MODAL ── */
 .modal-overlay {
@@ -167,7 +296,7 @@
 .modal-box {
   background: var(--surface);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-elevated);
   width: 520px; max-width: 95vw;
   max-height: 80vh;
   display: flex; flex-direction: column;
@@ -365,7 +494,7 @@
 
 .sidebar-tabs button.active {
   color: var(--accent);
-  border-bottom-color: var(--accent);
+  border-bottom-color: var(--accent-light);
 }
 
 .sidebar-body {
